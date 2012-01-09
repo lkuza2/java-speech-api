@@ -1,0 +1,98 @@
+package com.darkprograms.speech.recognizer;
+
+import javaFlacEncoder.FLACEncoder;
+import javaFlacEncoder.FLACFileOutputStream;
+import javaFlacEncoder.StreamConfiguration;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
+/**
+ * Class that contains methods to encode Wave files to FLAC files
+ * THIS IS THANKS TO THE javaFlacEncoder Project created here: http://sourceforge.net/projects/javaflacencoder/
+ */
+public class FlacEncoder {
+
+    /**
+     * Constructor
+     */
+    public FlacEncoder() {
+
+    }
+
+    /**
+     * Converts a wave file to a FLAC file(in order to POST the data to Google and retrieve a response) <br>
+     * Sample Rate is 8000 by default
+     *
+     * @param inputFile  Input wave file
+     * @param outputFile Output FLAC file
+     */
+    public void convertWaveToFlac(File inputFile, File outputFile) {
+
+
+        StreamConfiguration streamConfiguration = new StreamConfiguration();
+        streamConfiguration.setSampleRate(8000);
+        streamConfiguration.setBitsPerSample(16);
+        streamConfiguration.setChannelCount(1);
+
+
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputFile);
+            AudioFormat format = audioInputStream.getFormat();
+
+            int frameSize = format.getFrameSize();
+
+            FLACEncoder flacEncoder = new FLACEncoder();
+            FLACFileOutputStream flacOutputStream = new FLACFileOutputStream(outputFile);
+
+            flacEncoder.setStreamConfiguration(streamConfiguration);
+            flacEncoder.setOutputStream(flacOutputStream);
+
+            flacEncoder.openFLACStream();
+
+            int[] sampleData = new int[(int) audioInputStream.getFrameLength()];
+            byte[] samplesIn = new byte[frameSize];
+
+            int i = 0;
+
+            while (audioInputStream.read(samplesIn, 0, frameSize) != -1) {
+
+                ByteBuffer bb = ByteBuffer.wrap(samplesIn);
+                bb.order(ByteOrder.LITTLE_ENDIAN);
+                short shortVal = bb.getShort();
+
+                sampleData[i] = shortVal;
+
+                i++;
+            }
+
+            flacEncoder.addSamples(sampleData, i);
+            flacEncoder.encodeSamples(i, false);
+            flacEncoder.encodeSamples(flacEncoder.samplesAvailableToEncode(), true);
+
+            audioInputStream.close();
+            flacOutputStream.close();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Converts a wave file to a FLAC file(in order to POST the data to Google and retrieve a response) <br>
+     * Sample Rate is 8000 by default
+     *
+     * @param inputFile  Input wave file
+     * @param outputFile Output FLAC file
+     */
+    public void convertWaveToFlac(String inputFile, String outputFile) {
+        convertWaveToFlac(new File(inputFile), new File(outputFile));
+    }
+
+
+}
