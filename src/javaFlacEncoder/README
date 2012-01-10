@@ -1,0 +1,50 @@
+/*
+ * Copyright (C) 2010  Preston Lacey http://javaflacencoder.sourceforge.net/
+ * All Rights Reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+The javaFlacEncoder project provides a FLAC encoder implemented in java.
+It is designed to enable easy addition of FLAC encoding support in java 
+applications, though a command line file encoding utility is included as well. 
+For usage of the command line encoder, see the "Console Usage" section below.
+
+For more information, go to http://javaflacencoder.sourceforge.net.
+See javadocs for information on how to make use of this library in your own
+application.
+
+
+
+Console Usage:
+  <commandName> [options] inputFilename outputFilename
+  note: <commandName> will depend on how your version is packaged, if it's
+  in a tar file, it will be similar to
+  java -classpath <path/to/file.jar> javaFlacEncoder/FLAC_ConsoleFileEncoder
+
+options:
+  -bmin <x>     minimum block size, where <x> is an integer in range (16-65535)
+  -bmax <x>     maximum block size, where <x> is an integer in range (16-65535)
+  -lpcmin <x>   minimum LPC order, where <x> is an integer in range (1-32)
+  -lpcmax <x>   maximum LPC order, where <x> is an integer in range (1-32)
+  -Threads <x>  Specify whether to use threads. 0 turns threading off, greater
+                than 0 turns threading on
+  -sf <type>    Specify which subframe type to use, where <type> may be:
+      exhaustive(this is default and recommended)
+      fixed
+      lpc
+      verbatim;
+
+
