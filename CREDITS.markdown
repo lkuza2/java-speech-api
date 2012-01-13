@@ -24,6 +24,11 @@ created without it.
 ##Credits
 The following people/organizations have helped provide functionality for the API example,
 
+* JLayer Project
+    * Provided funtionality to play the MP3 audio received from Google for the Synthesiser
+    * Homepage: http://www.javazoom.net/javalayer/javalayer.html
+
 * AePlayWave class
-    * Provided functionality to play the MP3 audio received from Google
+    * Provided functionality to play the Wave audio received from the Microphone
     * Probable homepage: http://www.anyexample.com/programming/java/java_play_wav_sound_file.xml
+    * Does not need to be included in the API Example project, the source file(One class) is already included
