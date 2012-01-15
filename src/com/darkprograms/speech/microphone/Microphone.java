@@ -18,7 +18,7 @@ public class Microphone {
     /**
      * Enum for current Microphone state
      */
-    private enum CaptureState {
+    public enum CaptureState {
         PROCESSING_AUDIO, STARTING_CAPTURE, CLOSED
     }
 
@@ -44,18 +44,8 @@ public class Microphone {
      *         STARTING_CAPTURE is returned if the Thread is setting variables<br>
      *         CLOSED is returned if the Thread is not doing anything/not capturing audio
      */
-    public String getState() {
-        switch (state) {
-            case PROCESSING_AUDIO:
-                return "PROCESSING_AUDIO";
-            case STARTING_CAPTURE:
-                return "STARTING_CAPTURE";
-            case CLOSED:
-                return "CLOSED";
-
-            default:
-                return "CLOSED";
-        }
+    public CaptureState getState() {
+        return state;
     }
 
     /**
@@ -111,8 +101,8 @@ public class Microphone {
      * @throws Exception Throws an exception if something went wrong
      */
     public void captureAudioToFile(File audioFile) throws Exception {
-        setAudioFile(audioFile);
         setState(CaptureState.STARTING_CAPTURE);
+        setAudioFile(audioFile);
 
         DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
         setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
@@ -131,9 +121,9 @@ public class Microphone {
      * @throws Exception Throws an exception if something went wrong
      */
     public void captureAudioToFile(String audioFile) throws Exception {
+        setState(CaptureState.STARTING_CAPTURE);
         File file = new File(audioFile);
         setAudioFile(file);
-        setState(CaptureState.STARTING_CAPTURE);
 
         DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
         setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
@@ -169,9 +159,8 @@ public class Microphone {
      * If already closed, this does nothing
      */
     public void close() {
-        if (getState().equals("CLOSED")) {
+        if (getState() == CaptureState.CLOSED) {
         } else {
-            setState(CaptureState.CLOSED);
             getTargetDataLine().stop();
             getTargetDataLine().close();
         }
@@ -187,12 +176,13 @@ public class Microphone {
          */
         public void run() {
             try {
-                state = CaptureState.PROCESSING_AUDIO;
+                setState(CaptureState.PROCESSING_AUDIO);
                 AudioFileFormat.Type fileType = getFileType();
                 File audioFile = getAudioFile();
                 getTargetDataLine().open(getAudioFormat());
                 getTargetDataLine().start();
                 AudioSystem.write(new AudioInputStream(getTargetDataLine()), fileType, audioFile);
+                setState(CaptureState.CLOSED);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
