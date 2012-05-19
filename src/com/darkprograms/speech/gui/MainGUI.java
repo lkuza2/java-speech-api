@@ -86,7 +86,7 @@ public class MainGUI extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setText("API Version: v1.00");
+        jLabel3.setText("API Version: v1.01");
 
         jLabel4.setText("Microphone and Recognizer");
 
@@ -166,7 +166,7 @@ public class MainGUI extends javax.swing.JFrame {
             }
         });
 
-        jLabel13.setText("Program Version: v1.00");
+        jLabel13.setText("Program Version: v1.01");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -428,7 +428,7 @@ public class MainGUI extends javax.swing.JFrame {
         public void run() {
             while (true) {
                 try {
-                    state.setText(microphone.getState());
+                    state.setText(microphone.getState().toString());
                     Thread.sleep(3000);
 
                 } catch (Exception ex) {

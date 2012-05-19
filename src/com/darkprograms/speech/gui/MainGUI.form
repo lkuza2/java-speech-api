@@ -242,7 +242,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
-        <Property name="text" type="java.lang.String" value="API Version: v1.00"/>
+        <Property name="text" type="java.lang.String" value="API Version: v1.01"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JSeparator" name="jSeparator1">
@@ -382,7 +382,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel13">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Program Version: v1.00"/>
+        <Property name="text" type="java.lang.String" value="Program Version: v1.01"/>
       </Properties>
     </Component>
   </SubComponents>
