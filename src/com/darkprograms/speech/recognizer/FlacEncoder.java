@@ -60,12 +60,14 @@ public class FlacEncoder {
             int i = 0;
 
             while (audioInputStream.read(samplesIn, 0, frameSize) != -1) {
-
+                if(frameSize != 1){
                 ByteBuffer bb = ByteBuffer.wrap(samplesIn);
                 bb.order(ByteOrder.LITTLE_ENDIAN);
                 short shortVal = bb.getShort();
-
                 sampleData[i] = shortVal;
+                }else{
+                    sampleData[i] = samplesIn[0];
+                }
 
                 i++;
             }

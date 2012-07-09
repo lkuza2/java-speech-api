@@ -37,16 +37,20 @@ public class Recognizer {
         String response = rawRequest(flacFile);
 
         //Delete converted FLAC data
-        flacFile.delete();
+        //flacFile.delete();
 
         String[] parsedResponse = parseResponse(response);
 
 
         GoogleResponse googleResponse = new GoogleResponse();
 
-
+        if(response.length() == 0){
         googleResponse.setResponse(parsedResponse[0]);
         googleResponse.setConfidence(parsedResponse[1]);
+        }else{
+            googleResponse.setResponse(null);
+            googleResponse.setConfidence(null);
+        }
 
         return googleResponse;
     }
@@ -76,8 +80,14 @@ public class Recognizer {
         GoogleResponse googleResponse = new GoogleResponse();
 
 
-        googleResponse.setResponse(parsedResponse[0]);
-        googleResponse.setConfidence(parsedResponse[1]);
+        if(response.length() == 0){
+            googleResponse.setResponse(parsedResponse[0]);
+            googleResponse.setConfidence(parsedResponse[1]);
+        }else{
+            googleResponse.setResponse(null);
+            googleResponse.setConfidence(null);
+        }
+
 
         return googleResponse;
     }
@@ -100,6 +110,9 @@ public class Recognizer {
      * @return Returns the parsed response.  Index 0 is response, Index 1 is confidence score
      */
     private String[] parseResponse(String rawResponse) {
+        if(!rawResponse.contains("utterance"))
+        return null;
+
         String[] parsedResponse = new String[2];
 
         String[] strings = rawResponse.split(":");
