@@ -37,14 +37,13 @@ public class Recognizer {
         String response = rawRequest(flacFile);
 
         //Delete converted FLAC data
-        //flacFile.delete();
+        flacFile.delete();
 
         String[] parsedResponse = parseResponse(response);
 
-
         GoogleResponse googleResponse = new GoogleResponse();
 
-        if(response.length() == 0){
+        if(parsedResponse != null){
         googleResponse.setResponse(parsedResponse[0]);
         googleResponse.setConfidence(parsedResponse[1]);
         }else{
@@ -80,7 +79,7 @@ public class Recognizer {
         GoogleResponse googleResponse = new GoogleResponse();
 
 
-        if(response.length() == 0){
+        if(parsedResponse != null){
             googleResponse.setResponse(parsedResponse[0]);
             googleResponse.setConfidence(parsedResponse[1]);
         }else{
