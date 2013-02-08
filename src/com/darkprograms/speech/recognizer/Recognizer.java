@@ -12,7 +12,7 @@ public class Recognizer {
     /**
      * URL to POST audio data and retrieve results
      */
-    private static final String GOOGLE_RECOGNIZER_URL = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang=en-US";
+    private static final String GOOGLE_RECOGNIZER_URL_NO_LANG = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang=";
 
     /**
      * Constructor
@@ -25,16 +25,17 @@ public class Recognizer {
      * Get recognized data from a Wave file.  This method will encode the wave file to a FLAC
      *
      * @param waveFile Wave file to recognize
+     * @param language Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
      * @return Returns a GoogleResponse, with the response and confidence score
      * @throws Exception Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForWave(File waveFile) throws Exception {
+    public GoogleResponse getRecognizedDataForWave(File waveFile, String language) throws Exception {
         FlacEncoder flacEncoder = new FlacEncoder();
         File flacFile = new File(waveFile + ".flac");
 
         flacEncoder.convertWaveToFlac(waveFile, flacFile);
 
-        String response = rawRequest(flacFile);
+        String response = rawRequest(flacFile, language);
 
         //Delete converted FLAC data
         flacFile.delete();
@@ -43,10 +44,10 @@ public class Recognizer {
 
         GoogleResponse googleResponse = new GoogleResponse();
 
-        if(parsedResponse != null){
-        googleResponse.setResponse(parsedResponse[0]);
-        googleResponse.setConfidence(parsedResponse[1]);
-        }else{
+        if (parsedResponse != null) {
+            googleResponse.setResponse(parsedResponse[0]);
+            googleResponse.setConfidence(parsedResponse[1]);
+        } else {
             googleResponse.setResponse(null);
             googleResponse.setConfidence(null);
         }
@@ -58,31 +59,33 @@ public class Recognizer {
      * Get recognized data from a Wave file.  This method will encode the wave file to a FLAC
      *
      * @param waveFile Wave file to recognize
+     * @param language Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
      * @return Returns a GoogleResponse, with the response and confidence score
      * @throws Exception Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForWave(String waveFile) throws Exception {
-        return getRecognizedDataForWave(new File(waveFile));
+    public GoogleResponse getRecognizedDataForWave(String waveFile, String language) throws Exception {
+        return getRecognizedDataForWave(new File(waveFile), language);
     }
 
     /**
      * Get recognized data from a FLAC file.
      *
      * @param flacFile FLAC file to recognize
+     * @param language Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
      * @return Returns a GoogleResponse, with the response and confidence score
      * @throws Exception Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForFlac(File flacFile) throws Exception {
-        String response = rawRequest(flacFile);
+    public GoogleResponse getRecognizedDataForFlac(File flacFile, String language) throws Exception {
+        String response = rawRequest(flacFile, language);
         String[] parsedResponse = parseResponse(response);
 
         GoogleResponse googleResponse = new GoogleResponse();
 
 
-        if(parsedResponse != null){
+        if (parsedResponse != null) {
             googleResponse.setResponse(parsedResponse[0]);
             googleResponse.setConfidence(parsedResponse[1]);
-        }else{
+        } else {
             googleResponse.setResponse(null);
             googleResponse.setConfidence(null);
         }
@@ -95,11 +98,60 @@ public class Recognizer {
      * Get recognized data from a FLAC file.
      *
      * @param flacFile FLAC file to recognize
+     * @param language Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
+     * @return Returns a GoogleResponse, with the response and confidence score
+     * @throws Exception Throws exception if something goes wrong
+     */
+    public GoogleResponse getRecognizedDataForFlac(String flacFile, String language) throws Exception {
+        return getRecognizedDataForFlac(new File(flacFile), language);
+    }
+
+    /**
+     * Get recognized data from a Wave file.  This method will encode the wave file to a FLAC.
+     * This method will automatically set the language to en-US, or English
+     *
+     * @param waveFile Wave file to recognize
+     * @return Returns a GoogleResponse, with the response and confidence score
+     * @throws Exception Throws exception if something goes wrong
+     */
+    public GoogleResponse getRecognizedDataForWave(File waveFile) throws Exception {
+        return getRecognizedDataForWave(waveFile, "en-US");
+    }
+
+    /**
+     * Get recognized data from a Wave file.  This method will encode the wave file to a FLAC.
+     * This method will automatically set the language to en-US, or English
+     *
+     * @param waveFile Wave file to recognize
+     * @return Returns a GoogleResponse, with the response and confidence score
+     * @throws Exception Throws exception if something goes wrong
+     */
+    public GoogleResponse getRecognizedDataForWave(String waveFile) throws Exception {
+        return getRecognizedDataForWave(waveFile, "en-US");
+    }
+
+    /**
+     * Get recognized data from a FLAC file.
+     * This method will automatically set the language to en-US, or English
+     *
+     * @param flacFile FLAC file to recognize
+     * @return Returns a GoogleResponse, with the response and confidence score
+     * @throws Exception Throws exception if something goes wrong
+     */
+    public GoogleResponse getRecognizedDataForFlac(File flacFile) throws Exception {
+        return getRecognizedDataForFlac(flacFile, "en-US");
+    }
+
+    /**
+     * Get recognized data from a FLAC file.
+     * This method will automatically set the language to en-US, or English
+     *
+     * @param flacFile FLAC file to recognize
      * @return Returns a GoogleResponse, with the response and confidence score
      * @throws Exception Throws exception if something goes wrong
      */
     public GoogleResponse getRecognizedDataForFlac(String flacFile) throws Exception {
-        return getRecognizedDataForFlac(new File(flacFile));
+        return getRecognizedDataForFlac(flacFile, "en-US");
     }
 
     /**
@@ -109,8 +161,8 @@ public class Recognizer {
      * @return Returns the parsed response.  Index 0 is response, Index 1 is confidence score
      */
     private String[] parseResponse(String rawResponse) {
-        if(!rawResponse.contains("utterance"))
-        return null;
+        if (!rawResponse.contains("utterance"))
+            return null;
 
         String[] parsedResponse = new String[2];
 
@@ -130,14 +182,14 @@ public class Recognizer {
      * @return Returns the raw, unparsed response from Google
      * @throws Exception Throws exception if something went wrong
      */
-    private String rawRequest(File inputFile) throws Exception {
+    private String rawRequest(File inputFile, String language) throws Exception {
         URL url;
         URLConnection urlConn;
         OutputStream outputStream;
         BufferedReader br;
 
         // URL of Remote Script.
-        url = new URL(GOOGLE_RECOGNIZER_URL);
+        url = new URL(GOOGLE_RECOGNIZER_URL_NO_LANG + language);
 
         // Open New URL connection channel.
         urlConn = url.openConnection();
