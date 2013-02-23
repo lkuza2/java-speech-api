@@ -1,9 +1,12 @@
 package com.darkprograms.speech.recognizer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Class that holds the response and confidence of a Google recognizer request
  *
- * @author Luke Kuza
+ * @author Luke Kuza, Duncan Jauncey
  */
 public class GoogleResponse {
 
@@ -15,6 +18,11 @@ public class GoogleResponse {
      * Variable that holds the confidence score
      */
     private String confidence;
+
+    /**
+     * List that holds other possible responses for this request.
+     */
+    private List<String> otherPossibleResponses = new ArrayList(20);
 
     /**
      * Constructor
@@ -60,5 +68,12 @@ public class GoogleResponse {
         this.confidence = confidence;
     }
 
+    /**
+     * Get other possible responses for this request.
+     * @return
+     */
+    public List<String> getOtherPossibleResponses() {
+        return otherPossibleResponses;
+    }
 
 }
