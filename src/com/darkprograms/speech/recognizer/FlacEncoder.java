@@ -10,6 +10,8 @@ import javax.sound.sampled.AudioSystem;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class that contains methods to encode Wave files to FLAC files
@@ -31,7 +33,7 @@ public class FlacEncoder {
      * @param inputFile  Input wave file
      * @param outputFile Output FLAC file
      */
-    public void convertWaveToFlac(File inputFile, File outputFile) {
+    public void convertWaveToFlac(File inputFile, File outputFile) throws Exception {
 
 
         StreamConfiguration streamConfiguration = new StreamConfiguration();
@@ -80,7 +82,9 @@ public class FlacEncoder {
             flacOutputStream.close();
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Logger.getLogger(FlacEncoder.class.getName()).log(Level.SEVERE, ex.getClass().getName(), ex);
+            
+            throw ex;
         }
     }
 
@@ -93,7 +97,11 @@ public class FlacEncoder {
      * @param outputFile Output FLAC file
      */
     public void convertWaveToFlac(String inputFile, String outputFile) {
-        convertWaveToFlac(new File(inputFile), new File(outputFile));
+        try {
+            convertWaveToFlac(new File(inputFile), new File(outputFile));
+        } catch (Exception ex) {
+            Logger.getLogger(FlacEncoder.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 

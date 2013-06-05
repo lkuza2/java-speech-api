@@ -1,13 +1,18 @@
-package com.darkprograms.speech.recognizer;
+﻿package com.darkprograms.speech.recognizer;
 
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 /**
  * Class that submits FLAC audio and retrieves recognized text
  *
- * @author Luke Kuza, Duncan Jauncey
+ * @author Luke Kuza, Duncan Jauncey, Víctor Martín Molina
  */
 public class Recognizer {
 
@@ -15,6 +20,8 @@ public class Recognizer {
      * URL to POST audio data and retrieve results
      */
     private static final String GOOGLE_RECOGNIZER_URL = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium";
+    
+    private static final String CONFIDENCE = "confidence";
 
     private boolean profanityFilter = true;
     private String language = null;
@@ -29,6 +36,14 @@ public class Recognizer {
     }
 
     /**
+     * 
+     * @return Google's profanity filter
+     */
+    public boolean isProfanityFilter() {
+        return profanityFilter;
+    }
+    
+    /**
      * Enable/disable Google's profanity filter (on by default).
      * @param profanityFilter
      */
@@ -36,6 +51,13 @@ public class Recognizer {
         this.profanityFilter = profanityFilter;
     }
 
+    /**
+     * @return Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
+     */
+    public String getLanguage() {
+        return language;
+    }
+    
     /**
      * Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
      * Setting this to null will make Google use it's own language detection.
@@ -161,49 +183,34 @@ public class Recognizer {
      * Parses the raw response from Google
      *
      * @param rawResponse The raw, unparsed response from Google
-     * @return Returns the parsed response.  Index 0 is response, Index 1 is confidence score
+     * @return Returns the parsed response.
      */
-    private void parseResponse(String rawResponse, GoogleResponse googleResponse) {
-        if (!rawResponse.contains("utterance"))
-            return;
+    void parseResponse(String rawResponse, GoogleResponse googleResponse) {
+        try {
+            JSONObject json = JSONObject.fromObject(rawResponse);
+            int status = json.getInt("status");
 
-        String array = substringBetween(rawResponse, "[", "]");
-        String[] parts = array.split("}");
-        System.out.println(parts.length);
+            if (status == 0) {
+                JSONArray hypotheses = json.getJSONArray("hypotheses");
 
-        boolean first = true;
-        for( String s : parts ) {
-            if( first ) {
-                first = false;
-                String utterancePart = s.split(",")[0];
-                String confidencePart = s.split(",")[1];
+                for (int index = 0; index < hypotheses.size(); index++) {
+                    JSONObject hypothese = (JSONObject) hypotheses.get(index);
 
-                String utterance = utterancePart.split(":")[1];
-                String confidence = confidencePart.split(":")[1];
-
-                utterance = stripQuotes(utterance);
-                confidence = stripQuotes(confidence);
-
-                if( utterance.equals("null") ) {
-                    utterance = null;
+                    if (hypothese.containsKey(CONFIDENCE)) {
+                        googleResponse.setResponse(hypothese.getString("utterance"));
+                        googleResponse.setConfidence(hypothese.getDouble(CONFIDENCE) + "");
+                    } else {
+                        googleResponse.getOtherPossibleResponses().add(hypothese.getString("utterance"));
+                    }
                 }
-                if( confidence.equals("null") ) {
-                    confidence = null;
-                }
-
-                googleResponse.setResponse(utterance);
-                googleResponse.setConfidence(confidence);
             } else {
-                String utterance = s.split(":")[1];
-                utterance = stripQuotes(utterance);
-                if( utterance.equals("null") ) {
-                    utterance = null;
-                }
-                googleResponse.getOtherPossibleResponses().add(utterance);
+                Logger.getLogger(Recognizer.class.getName()).log(Level.WARNING, "status: {0}", status);
             }
+        } catch (JSONException e) {
+            Logger.getLogger(Recognizer.class.getName()).log(Level.WARNING, e.getLocalizedMessage(), e);
         }
     }
-
+    
     /**
      * Performs the request to Google with a file <br>
      * Request is buffered
@@ -270,32 +277,5 @@ public class Recognizer {
         return response;
 
     }
-
-    private String substringBetween(String s, String part1, String part2) {
-        String sub = null;
-
-        int i = s.indexOf(part1);
-        int j = s.indexOf(part2, i + part1.length());
-
-        if (i != -1 && j != -1) {
-            int nStart = i + part1.length();
-            sub = s.substring(nStart, j);
-        }
-
-        return sub;
-    }
-
-    private String stripQuotes(String s) {
-        int start = 0;
-        if( s.startsWith("\"") ) {
-            start = 1;
-        }
-        int end = s.length();
-        if( s.endsWith("\"") ) {
-            end = s.length() - 1;
-        }
-        return s.substring(start, end);
-    }
-
 
 }
