@@ -6,52 +6,67 @@ import java.net.URLConnection;
 
 /**
  * Class that submits FLAC audio and retrieves recognized text
+ *
+ * @author Luke Kuza, Duncan Jauncey
  */
 public class Recognizer {
 
     /**
      * URL to POST audio data and retrieve results
      */
-    private static final String GOOGLE_RECOGNIZER_URL_NO_LANG = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang=";
+    private static final String GOOGLE_RECOGNIZER_URL = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium";
+
+    private boolean profanityFilter = true;
+    private String language = null;
+
+    public static final String LANG_US_ENGLISH = "en-US";
+    public static final String LANG_UK_ENGLISH = "en-GB";
 
     /**
      * Constructor
      */
     public Recognizer() {
+    }
 
+    /**
+     * Enable/disable Google's profanity filter (on by default).
+     * @param profanityFilter
+     */
+    public void setProfanityFilter(boolean profanityFilter) {
+        this.profanityFilter = profanityFilter;
+    }
+
+    /**
+     * Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
+     * Setting this to null will make Google use it's own language detection.
+     * This value is null by default.
+     * @param language
+     */
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     /**
      * Get recognized data from a Wave file.  This method will encode the wave file to a FLAC
      *
      * @param waveFile Wave file to recognize
-     * @param language Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
+     * @param maxResults Maximum number of results to return in response
      * @return Returns a GoogleResponse, with the response and confidence score
      * @throws Exception Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForWave(File waveFile, String language) throws Exception {
+    public GoogleResponse getRecognizedDataForWave(File waveFile, int maxResults) throws Exception {
         FlacEncoder flacEncoder = new FlacEncoder();
         File flacFile = new File(waveFile + ".flac");
 
         flacEncoder.convertWaveToFlac(waveFile, flacFile);
 
-        String response = rawRequest(flacFile, language);
+        String response = rawRequest(flacFile, maxResults);
 
         //Delete converted FLAC data
         flacFile.delete();
 
-        String[] parsedResponse = parseResponse(response);
-
         GoogleResponse googleResponse = new GoogleResponse();
-
-        if (parsedResponse != null) {
-            googleResponse.setResponse(parsedResponse[0]);
-            googleResponse.setConfidence(parsedResponse[1]);
-        } else {
-            googleResponse.setResponse(null);
-            googleResponse.setConfidence(null);
-        }
-
+        parseResponse(response, googleResponse);
         return googleResponse;
     }
 
@@ -59,38 +74,26 @@ public class Recognizer {
      * Get recognized data from a Wave file.  This method will encode the wave file to a FLAC
      *
      * @param waveFile Wave file to recognize
-     * @param language Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
+     * @param maxResults the maximum number of results to return in the response
      * @return Returns a GoogleResponse, with the response and confidence score
      * @throws Exception Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForWave(String waveFile, String language) throws Exception {
-        return getRecognizedDataForWave(new File(waveFile), language);
+    public GoogleResponse getRecognizedDataForWave(String waveFile, int maxResults) throws Exception {
+        return getRecognizedDataForWave(new File(waveFile), maxResults);
     }
 
     /**
      * Get recognized data from a FLAC file.
      *
      * @param flacFile FLAC file to recognize
-     * @param language Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
+     * @param maxResults the maximum number of results to return in the response
      * @return Returns a GoogleResponse, with the response and confidence score
      * @throws Exception Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForFlac(File flacFile, String language) throws Exception {
-        String response = rawRequest(flacFile, language);
-        String[] parsedResponse = parseResponse(response);
-
+    public GoogleResponse getRecognizedDataForFlac(File flacFile, int maxResults) throws Exception {
+        String response = rawRequest(flacFile, maxResults);
         GoogleResponse googleResponse = new GoogleResponse();
-
-
-        if (parsedResponse != null) {
-            googleResponse.setResponse(parsedResponse[0]);
-            googleResponse.setConfidence(parsedResponse[1]);
-        } else {
-            googleResponse.setResponse(null);
-            googleResponse.setConfidence(null);
-        }
-
-
+        parseResponse(response, googleResponse);
         return googleResponse;
     }
 
@@ -98,12 +101,12 @@ public class Recognizer {
      * Get recognized data from a FLAC file.
      *
      * @param flacFile FLAC file to recognize
-     * @param language Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
+     * @param maxResults the maximum number of results to return in the response
      * @return Returns a GoogleResponse, with the response and confidence score
      * @throws Exception Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForFlac(String flacFile, String language) throws Exception {
-        return getRecognizedDataForFlac(new File(flacFile), language);
+    public GoogleResponse getRecognizedDataForFlac(String flacFile, int maxResults) throws Exception {
+        return getRecognizedDataForFlac(new File(flacFile), maxResults);
     }
 
     /**
@@ -115,7 +118,7 @@ public class Recognizer {
      * @throws Exception Throws exception if something goes wrong
      */
     public GoogleResponse getRecognizedDataForWave(File waveFile) throws Exception {
-        return getRecognizedDataForWave(waveFile, "en-US");
+        return getRecognizedDataForWave(waveFile, 1);
     }
 
     /**
@@ -127,7 +130,7 @@ public class Recognizer {
      * @throws Exception Throws exception if something goes wrong
      */
     public GoogleResponse getRecognizedDataForWave(String waveFile) throws Exception {
-        return getRecognizedDataForWave(waveFile, "en-US");
+        return getRecognizedDataForWave(waveFile, 1);
     }
 
     /**
@@ -139,7 +142,7 @@ public class Recognizer {
      * @throws Exception Throws exception if something goes wrong
      */
     public GoogleResponse getRecognizedDataForFlac(File flacFile) throws Exception {
-        return getRecognizedDataForFlac(flacFile, "en-US");
+        return getRecognizedDataForFlac(flacFile, 1);
     }
 
     /**
@@ -151,7 +154,7 @@ public class Recognizer {
      * @throws Exception Throws exception if something goes wrong
      */
     public GoogleResponse getRecognizedDataForFlac(String flacFile) throws Exception {
-        return getRecognizedDataForFlac(flacFile, "en-US");
+        return getRecognizedDataForFlac(flacFile, 1);
     }
 
     /**
@@ -160,18 +163,45 @@ public class Recognizer {
      * @param rawResponse The raw, unparsed response from Google
      * @return Returns the parsed response.  Index 0 is response, Index 1 is confidence score
      */
-    private String[] parseResponse(String rawResponse) {
+    private void parseResponse(String rawResponse, GoogleResponse googleResponse) {
         if (!rawResponse.contains("utterance"))
-            return null;
+            return;
 
-        String[] parsedResponse = new String[2];
+        String array = substringBetween(rawResponse, "[", "]");
+        String[] parts = array.split("}");
+        System.out.println(parts.length);
 
-        String[] strings = rawResponse.split(":");
+        boolean first = true;
+        for( String s : parts ) {
+            if( first ) {
+                first = false;
+                String utterancePart = s.split(",")[0];
+                String confidencePart = s.split(",")[1];
 
-        parsedResponse[0] = strings[4].split("\"")[1];
-        parsedResponse[1] = strings[5].replace("}]}", "");
+                String utterance = utterancePart.split(":")[1];
+                String confidence = confidencePart.split(":")[1];
 
-        return parsedResponse;
+                utterance = stripQuotes(utterance);
+                confidence = stripQuotes(confidence);
+
+                if( utterance.equals("null") ) {
+                    utterance = null;
+                }
+                if( confidence.equals("null") ) {
+                    confidence = null;
+                }
+
+                googleResponse.setResponse(utterance);
+                googleResponse.setConfidence(confidence);
+            } else {
+                String utterance = s.split(":")[1];
+                utterance = stripQuotes(utterance);
+                if( utterance.equals("null") ) {
+                    utterance = null;
+                }
+                googleResponse.getOtherPossibleResponses().add(utterance);
+            }
+        }
     }
 
     /**
@@ -182,14 +212,26 @@ public class Recognizer {
      * @return Returns the raw, unparsed response from Google
      * @throws Exception Throws exception if something went wrong
      */
-    private String rawRequest(File inputFile, String language) throws Exception {
+    private String rawRequest(File inputFile, int maxResults) throws Exception {
         URL url;
         URLConnection urlConn;
         OutputStream outputStream;
         BufferedReader br;
 
+        StringBuilder sb = new StringBuilder(GOOGLE_RECOGNIZER_URL);
+        if( language != null ) {
+            sb.append("&lang=");
+            sb.append(language);
+        }
+        if( !profanityFilter ) {
+            sb.append("&pfilter=0");
+        }
+        sb.append("&maxresults=");
+        sb.append(maxResults);
+
         // URL of Remote Script.
-        url = new URL(GOOGLE_RECOGNIZER_URL_NO_LANG + language);
+        url = new URL(sb.toString());
+
 
         // Open New URL connection channel.
         urlConn = url.openConnection();
@@ -227,6 +269,32 @@ public class Recognizer {
 
         return response;
 
+    }
+
+    private String substringBetween(String s, String part1, String part2) {
+        String sub = null;
+
+        int i = s.indexOf(part1);
+        int j = s.indexOf(part2, i + part1.length());
+
+        if (i != -1 && j != -1) {
+            int nStart = i + part1.length();
+            sub = s.substring(nStart, j);
+        }
+
+        return sub;
+    }
+
+    private String stripQuotes(String s) {
+        int start = 0;
+        if( s.startsWith("\"") ) {
+            start = 1;
+        }
+        int end = s.length();
+        if( s.endsWith("\"") ) {
+            end = s.length() - 1;
+        }
+        return s.substring(start, end);
     }
 
 
