@@ -476,7 +476,8 @@ public class MainGUI extends javax.swing.JFrame {
         public void run() {
             Recognizer recognizer = new Recognizer();
             try {
-                GoogleResponse googleResponse = recognizer.getRecognizedDataForWave(file.getText(), languageCode.getText());
+                recognizer.setLanguage(languageCode.getText());
+                GoogleResponse googleResponse = recognizer.getRecognizedDataForWave(file.getText());
                 response.setText(googleResponse.getResponse());
                 confidence.setText(googleResponse.getConfidence());
             } catch (Exception ex) {
