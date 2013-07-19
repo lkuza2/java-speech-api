@@ -22,7 +22,7 @@ public class GoogleResponse {
     /**
      * List that holds other possible responses for this request.
      */
-    private List<String> otherPossibleResponses = new ArrayList(20);
+    private List<String> otherPossibleResponses = new ArrayList<String>(20);
 
     /**
      * Constructor
