@@ -10,8 +10,7 @@ import java.util.List;
 /**
  * Synthesiser class that connects to Google's unoffical API to retreive data
  *
- * @author Luke Kuza
- * @author Aaron Gokaslan (String parsing Methods)
+ * @author Luke Kuza, Aaron Gokaslan (Skylion)
  */
 public class Synthesiser {
 
