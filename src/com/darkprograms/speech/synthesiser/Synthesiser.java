@@ -116,5 +116,6 @@ public class Synthesiser {
     			return i;
     		}
     	}
+        return -1;
     }
 }
