@@ -16,5 +16,8 @@ The following people/organizations have helped provide functionality for the API
             * Allows for text to speech translation
     * Homepage: http://google.com
 
+* JSON-lib: http://json-lib.sourceforge.net/
+* JUnit: http://junit.org/
+
 I would like to thank the above so much for your work, this wrapper/API could not have been
 created without it.

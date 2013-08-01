@@ -1,4 +1,4 @@
-package com.darkprograms.speech.recognizer;
+﻿package com.darkprograms.speech.recognizer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Class that holds the response and confidence of a Google recognizer request
  *
- * @author Luke Kuza, Duncan Jauncey
+ * @author Luke Kuza, Duncan Jauncey, Víctor Martín Molina
  */
 public class GoogleResponse {
 
@@ -76,4 +76,35 @@ public class GoogleResponse {
         return otherPossibleResponses;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof GoogleResponse)) {
+            return false;
+        }
+        GoogleResponse googleResponse = (GoogleResponse) obj;
+        if (!response.equals(googleResponse.response)) {
+            return false;
+        }
+        if (!confidence.equals(googleResponse.confidence)) {
+            return false;
+        }
+        if (!otherPossibleResponses.equals(googleResponse.otherPossibleResponses)) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + (this.response != null ? this.response.hashCode() : 0);
+        hash = 59 * hash + (this.confidence != null ? this.confidence.hashCode() : 0);
+        hash = 59 * hash + (this.otherPossibleResponses != null ? this.otherPossibleResponses.hashCode() : 0);
+        return hash;
+    }
+    
 }
