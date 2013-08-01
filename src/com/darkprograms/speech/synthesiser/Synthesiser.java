@@ -17,13 +17,48 @@ public class Synthesiser {
     /**
      * URL to query for Google synthesiser
      */
-    private final static String GOOGLE_SYNTHESISER_URL = "http://translate.google.com/translate_tts?tl=en&q=";
+    private final static String GOOGLE_SYNTHESISER_URL = "http://translate.google.com/translate_tts?tl=";
+    
+    private String languageCode; //Specifies the language you want the voice to speak in.
+
+    //Languages
+    public static final String LANG_AU_ENGLISH = "en-AU";
+    public static final String LANG_US_ENGLISH = "en-US";
+    public static final String LANG_UK_ENGLISH = "en-GB";
+    public static final String LANG_ES_SPANISH = "es";
+    public static final String LANG_FR_FRENCH = "fr";
+    public static final String LANG_DE_GERMAN = "de"; 
+    //Please add on more regional languages as you find them. Also try to include the accent code if you can can.
 
     /**
      * Constructor
      */
     public Synthesiser() {
+        languageCode = "en-US"; //Defaults to English (United States)
+    }
+    
+    /**
+     * Overloaded Constructor that takes Language Code parameter
+     * 
+     */
+    public Synthesiser(String languageCode){
+        this.languageCode = languageCode;
+    }
 
+    /**
+     * Returns the current language code for the Synthesiser. 
+     * @return the current language code
+     */
+    public String getLanguageCode(){
+        return languageCode;
+    }
+   
+    /**
+     * Example: English(Generic) = en, English (US) = en-US, English (UK) = en-GB. and Spanish = es;
+     * @param languageCode The language code you would like to modify languageCode to.
+     */
+    public void setLanguage(String languageCode){
+        this.languageCode = languageCode;
     }
 
     /**
@@ -42,7 +77,7 @@ public class Synthesiser {
     	
     	String encoded = URLEncoder.encode(synthText, "UTF-8"); //Encode
 
-        URL url = new URL(GOOGLE_SYNTHESISER_URL + encoded);  //create url
+        URL url = new URL(GOOGLE_SYNTHESISER_URL + languageCode + "&q=" + encoded);  //create url
 
         // Open New URL connection channel.
         URLConnection urlConn = url.openConnection(); //Open connection
