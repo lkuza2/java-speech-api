@@ -158,6 +158,7 @@ public class Synthesiser {
      * @return True if it is, false if not.
      */
      private boolean isEndingPunctuation(char input){
-         return  tmp == ' ' || tmp == '.' || tmp == '!' || tmp == '?' || tmp == ';' || tmp == ':' || tmp == '|';
+         return  input == ' ' || input == '.' || input == '!' || input == '?' || input == ';' || input == ':' 
+            || input == '|';
      }
 }
