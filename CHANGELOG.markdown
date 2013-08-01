@@ -6,7 +6,8 @@ A tagged commit may or may not have a corresponding binary version available.
 Format:  Tag: `<Corresponding Tag>`
 
 * Version 1.06 (Tag v1.016)
-    * Added support in Synthesiser for strings longer than 99 characters (Credits to @Skylion007)
+    * Added support for synthesiser for strings longer than 99 characters (Credits to @Skylion007)
+    * Added support for synthesiser for multiple languages, accents, and voices. (Credits to @Skylion007)
 
 * Version 1.05 (Tag: v1.015)
     * Improved language support for recognizer (Credits to @duncanj)
