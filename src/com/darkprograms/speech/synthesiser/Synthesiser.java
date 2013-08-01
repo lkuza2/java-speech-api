@@ -145,11 +145,19 @@ public class Synthesiser {
     		return input.length();
     	for(int i = 99; i>=0; i--){
     		char tmp = input.charAt(i);
-    		if( tmp == ' ' || tmp == '.' || tmp == '!' || tmp == '?' || tmp == ';' || tmp == ':' || tmp == '؟'
-    				|| tmp == '|'){ //Ending punctuation for all languages according to Wikipedia
+    		if(isEndingPunctuation(tmp){ //Ending punctuation for all languages according to Wikipedia
     			return i;
     		}
     	}
         return -1;
     }
+    
+    /**
+     * Checks if char is an ending character
+     * @param The char you want check
+     * @return True if it is, false if not.
+     */
+     private boolean isEndingPunctuation(char input){
+         return  tmp == ' ' || tmp == '.' || tmp == '!' || tmp == '?' || tmp == ';' || tmp == ':' || tmp == '|';
+     }
 }
