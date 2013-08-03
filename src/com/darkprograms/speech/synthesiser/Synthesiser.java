@@ -145,7 +145,7 @@ public class Synthesiser {
     		return input.length();
     	for(int i = 99; i>=0; i--){
     		char tmp = input.charAt(i);
-    		if(isEndingPunctuation(tmp){ //Ending punctuation for all languages according to Wikipedia
+    		if(isEndingPunctuation(tmp)){
     			return i;
     		}
     	}
@@ -154,6 +154,7 @@ public class Synthesiser {
     
     /**
      * Checks if char is an ending character
+     * Ending punctuation for all languages according to Wikipedia (Except for Sanskrit non-unicode)
      * @param The char you want check
      * @return True if it is, false if not.
      */
