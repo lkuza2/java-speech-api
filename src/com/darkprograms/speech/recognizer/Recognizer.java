@@ -169,8 +169,7 @@ public class Recognizer {
 
         String array = substringBetween(rawResponse, "[", "]");
         String[] parts = array.split("}");
-        System.out.println(parts.length);
-
+        
         boolean first = true;
         for( String s : parts ) {
             if( first ) {
