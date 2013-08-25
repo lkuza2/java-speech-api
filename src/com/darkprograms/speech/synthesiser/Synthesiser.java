@@ -71,7 +71,6 @@ public class Synthesiser {
 	 * @param languageCode The language code you would like to modify languageCode to.
 	 */
 	public void setLanguage(String languageCode){
-
 		this.languageCode = languageCode;
 	}
 
@@ -235,7 +234,6 @@ public class Synthesiser {
 			buf.append((char) ch);
 		}
 		String str = buf.toString();
-		System.out.println(str);
 		return str;
 	}
 
