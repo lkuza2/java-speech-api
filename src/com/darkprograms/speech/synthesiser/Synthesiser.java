@@ -83,6 +83,12 @@ public class Synthesiser {
 	 */
 	public InputStream getMP3Data(String synthText) throws Exception {
 
+		if(synthText.length()>100){
+			List<String> fragments = parseString(synthText);//parses String if too long
+			return getMP3Data(fragments);
+		}
+
+		
 		String languageCode = this.languageCode;//Ensures retention of language settings if set to auto
 
 		if(languageCode == null || languageCode.equals("") || languageCode.equalsIgnoreCase("auto")){
@@ -96,11 +102,6 @@ public class Synthesiser {
 				ex.printStackTrace();
 				languageCode = "en-us";//Reverts to Default Language if it can't detect it.
 			}
-		}
-
-		if(synthText.length()>100){
-			List<String> fragments = parseString(synthText);//parses String if too long
-			return getMP3Data(fragments);
 		}
 
 		String encoded = URLEncoder.encode(synthText, "UTF-8"); //Encode
