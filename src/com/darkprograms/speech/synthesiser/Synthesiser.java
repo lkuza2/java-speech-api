@@ -243,14 +243,15 @@ public class Synthesiser {
 	}
 
 	/**
-	 * Searches RAWData for Language
-	 * @param RAWData the raw String directly from Google you want to search through
-	 * @return The language parsed from the rawData or en-US (English-United States) if Google cannot determine it.
+	 * Searches RawData for Language
+	 * @param RawData the raw String directly from Google you want to search through
+	 * @return The language parsed from the rawData or null if Google cannot determine it.
 	 */
 	private String parseRawData(String rawData){
-		for(int i = 0; i+3<=rawData.length(); i++){
-			if(rawData.charAt(i)=='"' && rawData.charAt(i+3)=='"'){
-				String possible = rawData.substring(i+1,i+3);
+		for(int i = 0; i+5<rawData.length(); i++){
+			if(rawData.charAt(i)==',' && rawData.charAt(i+5)==',' //Looks for ,"en", ,"es", etc.  
+					&& rawData.charAt(i+1)== '"' && rawData.charAt(i+4)=='"'){ // ,"**",
+				String possible = rawData.substring(i+2,i+4);
 				if(containsLettersOnly(possible)){//Required due to Google's inconsistent formatting.
 					return possible;
 				}
