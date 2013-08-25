@@ -89,6 +89,9 @@ public class Synthesiser {
 		if(languageCode == null || languageCode.equals("") || languageCode.equalsIgnoreCase("auto")){
 			try{
 				languageCode = detectLanguage(synthText);//Detects language
+				if(languageCode == null){
+					languageCode = "en-us";//Reverts to Default Language if it can't detect it.
+				}
 			}
 			catch(Exception ex){
 				ex.printStackTrace();
