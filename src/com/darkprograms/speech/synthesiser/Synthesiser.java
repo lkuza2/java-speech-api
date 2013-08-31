@@ -158,7 +158,7 @@ public class Synthesiser {
 		}
 		else{
 			int lastWord = findLastWord(input);//Checks if a space exists
-			if(lastWord<0){
+			if(lastWord<=0){
 				fragments.add(input.substring(0,100));//In case you sent gibberish to Google.
 				return parseString(input.substring(100), fragments);
 			}else{
@@ -181,7 +181,7 @@ public class Synthesiser {
 		for(int i = 99; i>=0; i--){
 			char tmp = input.charAt(i);
 			if(isEndingPunctuation(tmp)){
-				return i;
+				return i+1;
 			}
 			if(space==-1 && tmp == ' '){
 				space = i;
