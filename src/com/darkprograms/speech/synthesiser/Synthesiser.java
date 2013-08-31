@@ -178,7 +178,7 @@ public class Synthesiser {
 		if(input.length()<100)
 			return input.length();
 		int space = -1;
-		for(int i = 99; i>=0; i--){
+		for(int i = 99; i>0; i--){
 			char tmp = input.charAt(i);
 			if(isEndingPunctuation(tmp)){
 				return i+1;
@@ -187,7 +187,7 @@ public class Synthesiser {
 				space = i;
 			}
 		}
-		if(space>=0){
+		if(space>0){
 			return space;
 		}
 		return -1;
@@ -210,10 +210,14 @@ public class Synthesiser {
 	 * @throws Exception if it cannot complete the request
 	 */
 	public String detectLanguage(String text) throws Exception{
-
-		//GOOGLE rejects requests that are longer
-		if(text.length()>99){
-			text = text.substring(0,findLastWord(text));//We don't need the whole text to determine language
+		if(text.length()>99){//Google will not compute more than 99 characters
+			int lastWord = findLastWord(text);
+			if(lastWord<0){
+				text = text.substring(0,99);//Fix for languages without spaces. 
+			}
+			else{
+				text = text.substring(0,lastWord);//We don't need the whole text to determine language
+			}
 		}
 		String encoded = URLEncoder.encode(text, "UTF-8"); //Encode
 		URL url = new URL(GOOGLE_AUTODETECT_URL + encoded); //Generates URL
