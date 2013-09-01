@@ -27,15 +27,33 @@ public class Recognizer {
      */
     public Recognizer() {
     }
-
+    
     /**
-     * Enable/disable Google's profanity filter (on by default).
+     * Constructor
+     * @param Language
+     */
+    public Recognizer(String language) {
+        this.language = language; 
+    }
+    
+    /**
+     * Constructor
      * @param profanityFilter
      */
-    public void setProfanityFilter(boolean profanityFilter) {
-        this.profanityFilter = profanityFilter;
+    public Recognizer(boolean profanityFilter){
+    	this.profanityFilter = profanityFilter;
     }
-
+    
+    /**
+     * Constructor
+     * @param language
+     * @param profanityFilter
+     */
+    public Recognizer(String language, boolean profanityFilter){
+    	this.language = language;
+    	this.profanityFilter = profanityFilter;
+    }
+    
     /**
      * Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
      * Setting this to null will make Google use it's own language detection.
@@ -44,6 +62,25 @@ public class Recognizer {
      */
     public void setLanguage(String language) {
         this.language = language;
+    }
+    
+        
+    /**
+     * Returns the state of profanityFilter
+     * which enables/disables Google's profanity filter (on by default).
+     * @return profanityFilter
+     */
+    public boolean getProfanityFilter(){
+    	return profanityFilter;
+    }
+    
+    /**
+     * Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
+     * This value is null by default.
+     * @return language
+     */
+    public String getLanguage(){
+    	return language;
     }
 
     /**
