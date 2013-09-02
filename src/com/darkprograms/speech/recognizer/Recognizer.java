@@ -11,6 +11,95 @@ import java.net.URLConnection;
  */
 public class Recognizer {
 
+    public enum Languages{
+		BASQUE("eu"),
+		CATALAN("ca"),
+		ARABIC__JORDAN("ar-JO"),
+		ARABIC__LEBANON("ar-LB"),
+		ARABIC__QATAR("ar-QA"),
+		ARABIC__UAE("ar-AE"),
+		ARABIC__MOROCCO("ar-MA"),
+		ARABIC__IRAQ("ar-IQ"),
+		ARABIC__ALGERIA("ar-DZ"),
+		ARABIC__BAHRAIN("ar-BH"),
+		ARABIC__LYBIA("ar-LY"),
+		ARABIC__OMAN("ar-OM"),
+		ARABIC__SAUDI_ARABIA("ar-SA"),
+		ARABIC__TUNISIA("ar-TN"),
+		ARABIC__YEMEN("ar-YE"),
+		CZECH("cs"),
+		DUTCH("nl-NL"),
+		ENGLISH__AUSTRALIA("en-AU"),
+		ENGLISH__CANADA("en-CA"),
+		ENGLISH__INDIA("en-IN"),
+		ENGLISH__NEW_ZEALAND("en-NZ"),
+		ENGLISH__SOUTH_AFRICA("en-ZA"),
+		ENGLISH_UK("en-GB"),
+		ENGLISH_US("en-US"),
+		FINNISH("fi"),
+		FRENCH("fr-FR"),
+		GALICIAN("gl"),
+		GERMAN("de-DE"),
+		HEBREW("he"),
+		HUNGARIAN("hu"),
+		ICELANDIC("is"),
+		ITALIAN("it-IT"),
+		INDONESIAN("id"),
+		JAPANESE("ja"),
+		KOREAN("ko"),
+		LATIN("la"),
+		MANDARIN_CHINESE("zh-CN"),
+		TRADITIONAL_TAIWAN("zh-TW"),
+		SIMPLIFIED_CHINA("ZH-CN"),
+		SIMPLIFIED_HONG_KONG("zh-HK"),
+		YUE_CHINESE__TRADITIONAL_HONG_KONG("zh-yue"),
+		MALAYSIAN("ms-MY"),
+		NORWEGIAN("no-NO"),
+		POLISH("pl"),
+		PIG_LATIN("xx-piglatin"),
+		PORTUGUESE("pt-PT"),
+		PORTUGUESE__BRASIL("pt-BR"),
+		ROMANIAN("ro-RO"),
+		RUSSIAN("ru"),
+		SERBIAN("sr-SP"),
+		SLOVAK("sk"),
+		SPANISH__ARGENTINA("es-AR"),
+		SPANISH_BOLIVIA("es-BO"),
+		SPANISH__CHILE("es-CL"),
+		SPANISH__COLOMBIA("es-CO"),
+		SPANISH_COSTA_RICA("es-CR"),
+		SPANISH_DOMINICAN_REPUBLIC("es-DO"),
+		SPANISH_ECUADOR("es-EC"),
+		SPANISH_EL_SALVADOR("es-SV"),
+		SPANISH_GUATEMALA("es-GT"),
+		SPANISH_HONDURAS("es-HN"),
+		SPANISH_MEXICO("es-MX"),
+		SPANISH_NICARAGUA("es-NI"),
+		SPANISH_PANAMA("es-PA"),
+		SPANISH_PARAGUAY("es-PY"),
+		SPANISH_PERU("es-PE"),
+		SPANISH_PUERTO_RICO("es-PR"),
+		SPANISH_SPAIN("es-ES"),
+		SPANISH_US("es-US"),
+		SPANISH_URUGUAY("es-UY"),
+		SPANISH_VENEZUELA("es-VE"),
+		SWEDISH("sv-SE"),
+		TURKISH("tr"),
+		ZULU("zu");
+	    
+	    private final String languageCode;
+	    
+	    private Languages(final String languageCode){
+	    	this.languageCode = languageCode;
+	    }
+	    
+	    public String toString(){
+	    	return languageCode;
+	    }
+	      
+	}
+
+
     /**
      * URL to POST audio data and retrieve results
      */
@@ -55,13 +144,13 @@ public class Recognizer {
     }
     
     /**
-     * Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
+     * Language: Contains all supported languages for Google Speech to Text. 
      * Setting this to null will make Google use it's own language detection.
      * This value is null by default.
      * @param language
      */
-    public void setLanguage(String language) {
-        this.language = language;
+    public void setLanguage(Languages language) {
+        this.language = language.languageCode;
     }
     
         
