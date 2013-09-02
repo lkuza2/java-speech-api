@@ -249,20 +249,30 @@ public class Synthesiser {
 	}
 
 	/**
-	 * Searches RawData for Language
+	 * Searches RawData for Language & region if possible
 	 * @param RawData the raw String directly from Google you want to search through
 	 * @return The language parsed from the rawData or null if Google cannot determine it.
 	 */
 	private String parseRawData(String rawData){
 		for(int i = 0; i+5<rawData.length(); i++){
-			if(rawData.charAt(i)==',' && rawData.charAt(i+5)==',' //Looks for ,"en", ,"es", etc.  
-					&& rawData.charAt(i+1)== '"' && rawData.charAt(i+4)=='"'){ // ,"**",
-				String possible = rawData.substring(i+2,i+4);
-				if(containsLettersOnly(possible)){//Required due to Google's inconsistent formatting.
-					return possible;
+			boolean dashDetected = rawData.charAt(i+4)=='-';//Sometimes Google will detect the region too.
+			if(rawData.charAt(i)==','  && rawData.charAt(i+1)== '"' 
+					&& ((rawData.charAt(i+4)=='"' && rawData.charAt(i+5)==',')
+							|| dashDetected)){
+				if(dashDetected){//If region is detected parses the whole string!
+					int lastQuote = rawData.substring(i+2).indexOf('"');//Where the region ends
+					if(lastQuote>0)
+						return rawData.substring(i+2,i+2+lastQuote);
+				}
+				else{
+					String possible = rawData.substring(i+2,i+4);
+					if(containsLettersOnly(possible)){//Required due to Google's inconsistent formatting.
+						//System.out.println(possible);
+						return possible;
+					}
 				}
 			}
-		}
+		}//End of Loop
 		return null;
 	}
 
