@@ -156,7 +156,14 @@ public class Recognizer {
         this.language = language.languageCode;
     }
     
-        
+   /**Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
+     * This value is null by default.
+     */
+    @Deprecated
+    public void setLanguage(String language) {
+    	this.language = language;
+    }
+    
     /**
      * Returns the state of profanityFilter
      * which enables/disables Google's profanity filter (on by default).
