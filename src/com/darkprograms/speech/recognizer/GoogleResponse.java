@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Class that holds the response and confidence of a Google recognizer request
  *
- * @author Luke Kuza, Duncan Jauncey
+ * @author Luke Kuza, Duncan Jauncey, Aaron Gokaslan
  */
 public class GoogleResponse {
 
@@ -70,10 +70,20 @@ public class GoogleResponse {
 
     /**
      * Get other possible responses for this request.
-     * @return
+     * @return other possible responses
      */
     public List<String> getOtherPossibleResponses() {
         return otherPossibleResponses;
+    }
+    
+    /**
+     * Gets all returned responses for this request
+     * @return All returned responses
+     */
+    public List<String> getAllPossibleResponses() {
+    	List<String> tmp = otherPossibleResponses;
+    	tmp.add(0,response);
+    	return tmp;
     }
 
 }
