@@ -7,7 +7,7 @@ import java.net.URLConnection;
 /**
  * Class that submits FLAC audio and retrieves recognized text
  *
- * @author Luke Kuza, Duncan Jauncey
+ * @author Luke Kuza, Duncan Jauncey, Aaron Gokaslan
  */
 public class Recognizer {
 
@@ -107,9 +107,6 @@ public class Recognizer {
 
     private boolean profanityFilter = true;
     private String language = null;
-
-    public static final String LANG_US_ENGLISH = "en-US";
-    public static final String LANG_UK_ENGLISH = "en-GB";
 
     /**
      * Constructor
