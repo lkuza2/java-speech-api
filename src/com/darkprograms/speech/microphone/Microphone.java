@@ -6,10 +6,10 @@ import java.io.File;
 /**
  * Microphone class that contains methods to capture audio from microphone
  *
- * @author Luke Kuza
+ * @author Luke Kuza, Aaron Gokaslan
  */
 public class Microphone {
-
+	
     /**
      * TargetDataLine variable to receive data from microphone
      */
@@ -80,8 +80,8 @@ public class Microphone {
     public void setTargetDataLine(TargetDataLine targetDataLine) {
         this.targetDataLine = targetDataLine;
     }
-
-
+    
+    
     /**
      * Constructor
      *
@@ -135,6 +135,53 @@ public class Microphone {
 
     }
 
+    /**
+     * Gets the volume of the microphone input
+     * Note: Do not update more than every 250ms
+     * unless you specify a smaller numOfBytes
+     * @return The volume of the microphone input will return -1 if data-line is not available
+     */
+    public int getAudioVolume(){
+    	return getAudioVolume(2000);
+    }
+    
+    /**
+     * Gets the volume of microphone input
+     * @param numOfBytes The number of bytes you want for volume interpretation
+     * @return The volume over the specified number of bytes or -1 if mic is unavailable.
+     */
+    public int getAudioVolume(int numOfBytes){
+    	if(getTargetDataLine()!=null){
+    		byte[] data = new byte[numOfBytes];
+    		this.getTargetDataLine().read(data, 0, numOfBytes);
+    		return calculateRMSLevel(data);
+    	}
+		else{
+			return -1;
+		}
+    }
+    
+    /**
+     * Calculates the volume of AudioData which may be buffered data from a dataline
+     * @param audioData The byte[] you want to determine the volume of
+     * @return the calculated volume of audioData
+     */
+	private int calculateRMSLevel(byte[] audioData){
+		long lSum = 0;
+		for(int i=0; i<audioData.length; i++)
+			lSum = lSum + audioData[i];
+
+		double dAvg = lSum / audioData.length;
+
+		double sumMeanSquare = 0d;
+		for(int j=0; j<audioData.length; j++)
+			sumMeanSquare = sumMeanSquare + Math.pow(audioData[j] - dAvg, 2d);
+
+		double averageMeanSquare = sumMeanSquare / audioData.length;
+		return (int)(Math.pow(averageMeanSquare,0.5d) + 0.5);
+	}
+	
+    
     /**
      * The audio format to save in
      *
