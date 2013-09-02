@@ -224,6 +224,8 @@ public class Synthesiser {
 		URLConnection urlConn = url.openConnection(); //Open connection
 		urlConn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:2.0) Gecko/20100101 Firefox/4.0"); //Adding header for user agent is required
 		String rawData = urlToText(urlConn);//Gets text from Google
+		if(!isLanguageSupported(rawData))
+			return null;//Comment this if statement out if you want to use this code for rare languages like Maori.
 		return parseRawData(rawData);
 	}
 
@@ -276,6 +278,15 @@ public class Synthesiser {
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Check is a language is supported from rawData
+	 * @param rawData Checks if a language is supported based off of rawData
+	 * @return true if supported otherwise false.
+	 */
+	private boolean isLanguageSupported(String rawData){
+		return !rawData.contains(",\"We are not yet able to translate from ");
 	}
 }
 
