@@ -87,8 +87,14 @@ public class Recognizer {
 		TURKISH("tr"),
 		ZULU("zu");
 	    
+	    /*
+	     *Stores the LanguageCode
+	     */
 	    private final String languageCode;
 	    
+	    /*
+	     *Constructor
+	     */
 	    private Languages(final String languageCode){
 	    	this.languageCode = languageCode;
 	    }
