@@ -12,8 +12,7 @@ import java.net.URLConnection;
 public class Recognizer {
 
     public enum Languages{
-		BASQUE("eu"),
-		CATALAN("ca"),
+		AUTO_DETECT(null),//tells Google to auto-detect the language
 		ARABIC__JORDAN("ar-JO"),
 		ARABIC__LEBANON("ar-LB"),
 		ARABIC__QATAR("ar-QA"),
@@ -27,6 +26,8 @@ public class Recognizer {
 		ARABIC__SAUDI_ARABIA("ar-SA"),
 		ARABIC__TUNISIA("ar-TN"),
 		ARABIC__YEMEN("ar-YE"),
+		BASQUE("eu"),
+		CATALAN("ca"),
 		CZECH("cs"),
 		DUTCH("nl-NL"),
 		ENGLISH__AUSTRALIA("en-AU"),
@@ -87,18 +88,18 @@ public class Recognizer {
 		TURKISH("tr"),
 		ZULU("zu");
 	    
-	    /*
+	    /**
 	     *Stores the LanguageCode
 	     */
 	    private final String languageCode;
 	    
-	    /*
+	    /**
 	     *Constructor
 	     */
 	    private Languages(final String languageCode){
 	    	this.languageCode = languageCode;
 	    }
-	    
+
 	    public String toString(){
 	    	return languageCode;
 	    }

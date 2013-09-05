@@ -137,20 +137,28 @@ public class Microphone {
 
     /**
      * Gets the volume of the microphone input
-     * Note: Do not update more than every 250ms
-     * unless you specify a smaller numOfBytes
-     * @return The volume of the microphone input will return -1 if data-line is not available
+     * Interval is 100ms so allow 100ms for this method to run in your code or specify smaller interval.
+     * @return The volume of the microphone input or -1 if data-line is not available
      */
     public int getAudioVolume(){
-    	return getAudioVolume(2000);
+    	return getAudioVolume(100);
+    }
+    
+    /**
+     * Gets the volume of the microphone input
+     * @param interval: The length of time you would like to calculate the volume over in milliseconds.
+     * @return The volume of the microphone input or -1 if data-line is not available. 
+     */    
+    public int getAudioVolume(int interval){
+    	return calculateAudioVolume(this.getNumOfBytes(interval/1000d));
     }
     
     /**
      * Gets the volume of microphone input
      * @param numOfBytes The number of bytes you want for volume interpretation
-     * @return The volume over the specified number of bytes or -1 if mic is unavailable.
+     * @return The volume over the specified number of bytes or -1 if data-line is unavailable.
      */
-    public int getAudioVolume(int numOfBytes){
+    private int calculateAudioVolume(int numOfBytes){
     	if(getTargetDataLine()!=null){
     		byte[] data = new byte[numOfBytes];
     		this.getTargetDataLine().read(data, 0, numOfBytes);
@@ -162,7 +170,7 @@ public class Microphone {
     }
     
     /**
-     * Calculates the volume of AudioData which may be buffered data from a dataline
+     * Calculates the volume of AudioData which may be buffered data from a data-line
      * @param audioData The byte[] you want to determine the volume of
      * @return the calculated volume of audioData
      */
@@ -181,7 +189,24 @@ public class Microphone {
 		return (int)(Math.pow(averageMeanSquare,0.5d) + 0.5);
 	}
 	
-    
+	/**
+	 * Returns the number of bytes over interval for useful when figuring out how long to record.
+	 * @param seconds The length in seconds
+	 * @return the number of bytes the microphone will save.
+	 */
+	public int getNumOfBytes(int seconds){
+		return getNumOfBytes((double)seconds);
+	}
+	
+	/**
+	 * Returns the number of bytes over interval for useful when figuring out how long to record.
+	 * @param seconds The length in seconds
+	 * @return the number of bytes the microphone will output over the specified time.
+	 */
+	public int getNumOfBytes(double seconds){
+		return (int)(seconds*getAudioFormat().getSampleRate()*getAudioFormat().getFrameSize()+.5);
+	}
+	
     /**
      * The audio format to save in
      *
