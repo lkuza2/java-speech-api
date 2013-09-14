@@ -1,4 +1,4 @@
-#Java-Speech API Credits
+#J.A.R.V.I.S. Speech API (Java-Speech API) Credits
 
 ##Credits
 The following people/organizations have helped provide functionality for the API,
@@ -15,6 +15,8 @@ The following people/organizations have helped provide functionality for the API
         * Synthesiser
             * Allows for text to speech translation
     * Homepage: http://google.com
-
-I would like to thank the above so much for your work, this wrapper/API could not have been
+* Princeton University
+	* The implemented FFT algorithm is derived from one on the university's website.
+	* Homepage: http://www.princeton.edu
+We would like to thank the above so much for your work, this wrapper/API could not have been
 created without it.

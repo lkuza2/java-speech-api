@@ -1,6 +1,7 @@
 package com.darkprograms.speech.microphone;
 
 import javax.sound.sampled.*;
+
 import java.io.File;
 
 /**
@@ -91,6 +92,22 @@ public class Microphone {
     public Microphone(AudioFileFormat.Type fileType) {
         setState(CaptureState.CLOSED);
         setFileType(fileType);
+        initTargetDataLine();
+    }
+
+    /**
+     * Initializes the target data line.
+     */
+    private void initTargetDataLine(){
+        DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
+        try {
+			setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
+		} catch (LineUnavailableException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+
     }
 
 
@@ -135,84 +152,13 @@ public class Microphone {
 
     }
 
-    /**
-     * Gets the volume of the microphone input
-     * Interval is 100ms so allow 100ms for this method to run in your code or specify smaller interval.
-     * @return The volume of the microphone input or -1 if data-line is not available
-     */
-    public int getAudioVolume(){
-    	return getAudioVolume(100);
-    }
-    
-    /**
-     * Gets the volume of the microphone input
-     * @param interval: The length of time you would like to calculate the volume over in milliseconds.
-     * @return The volume of the microphone input or -1 if data-line is not available. 
-     */    
-    public int getAudioVolume(int interval){
-    	return calculateAudioVolume(this.getNumOfBytes(interval/1000d));
-    }
-    
-    /**
-     * Gets the volume of microphone input
-     * @param numOfBytes The number of bytes you want for volume interpretation
-     * @return The volume over the specified number of bytes or -1 if data-line is unavailable.
-     */
-    private int calculateAudioVolume(int numOfBytes){
-    	if(getTargetDataLine()!=null){
-    		byte[] data = new byte[numOfBytes];
-    		this.getTargetDataLine().read(data, 0, numOfBytes);
-    		return calculateRMSLevel(data);
-    	}
-		else{
-			return -1;
-		}
-    }
-    
-    /**
-     * Calculates the volume of AudioData which may be buffered data from a data-line
-     * @param audioData The byte[] you want to determine the volume of
-     * @return the calculated volume of audioData
-     */
-	private int calculateRMSLevel(byte[] audioData){
-		long lSum = 0;
-		for(int i=0; i<audioData.length; i++)
-			lSum = lSum + audioData[i];
-
-		double dAvg = lSum / audioData.length;
-
-		double sumMeanSquare = 0d;
-		for(int j=0; j<audioData.length; j++)
-			sumMeanSquare = sumMeanSquare + Math.pow(audioData[j] - dAvg, 2d);
-
-		double averageMeanSquare = sumMeanSquare / audioData.length;
-		return (int)(Math.pow(averageMeanSquare,0.5d) + 0.5);
-	}
-	
-	/**
-	 * Returns the number of bytes over interval for useful when figuring out how long to record.
-	 * @param seconds The length in seconds
-	 * @return the number of bytes the microphone will save.
-	 */
-	public int getNumOfBytes(int seconds){
-		return getNumOfBytes((double)seconds);
-	}
-	
-	/**
-	 * Returns the number of bytes over interval for useful when figuring out how long to record.
-	 * @param seconds The length in seconds
-	 * @return the number of bytes the microphone will output over the specified time.
-	 */
-	public int getNumOfBytes(double seconds){
-		return (int)(seconds*getAudioFormat().getSampleRate()*getAudioFormat().getFrameSize()+.5);
-	}
 	
     /**
      * The audio format to save in
      *
      * @return Returns AudioFormat to be used later when capturing audio from microphone
      */
-    private AudioFormat getAudioFormat() {
+    public AudioFormat getAudioFormat() {
         float sampleRate = 8000.0F;
         //8000,11025,16000,22050,44100
         int sampleSizeInBits = 16;
@@ -227,6 +173,28 @@ public class Microphone {
     }
 
     /**
+     * Opens the microphone, starting the targetDataLine.
+     * If it's already open, it does nothing.
+     */
+    public void open(){
+        if(getTargetDataLine()==null){
+        	initTargetDataLine();
+        }
+    	if(!getTargetDataLine().isOpen() && getState()==CaptureState.CLOSED){
+        	try {
+                setState(CaptureState.PROCESSING_AUDIO);
+        		getTargetDataLine().open(getAudioFormat());
+            	getTargetDataLine().start();
+			} catch (LineUnavailableException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
+			}
+        }
+
+    }
+
+    /**
      * Close the microphone capture, saving all processed audio to the specified file.<br>
      * If already closed, this does nothing
      */
@@ -235,6 +203,7 @@ public class Microphone {
         } else {
             getTargetDataLine().stop();
             getTargetDataLine().close();
+            setState(CaptureState.CLOSED);
         }
     }
 
@@ -248,13 +217,11 @@ public class Microphone {
          */
         public void run() {
             try {
-                setState(CaptureState.PROCESSING_AUDIO);
                 AudioFileFormat.Type fileType = getFileType();
                 File audioFile = getAudioFile();
-                getTargetDataLine().open(getAudioFormat());
-                getTargetDataLine().start();
+                open();
                 AudioSystem.write(new AudioInputStream(getTargetDataLine()), fileType, audioFile);
-                setState(CaptureState.CLOSED);
+                //Will write to File until it's closed.
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

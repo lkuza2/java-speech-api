@@ -1,8 +1,8 @@
 #J.A.R.V.I.S. (Java-Speech-API)
 
-J.A.R.V.I.S. Speech API: Just A Real Vocal Interpreter & Synthesizer. 
-This is a project for the Java Speech API. Interprets vocal inputs into text and synthesises MP3Data from text input.
-(Think Steven Hawkings) Even includes language auto-detection! 
+J.A.R.V.I.S. Speech API: Just A Reliable Vocal Interpreter & Synthesizer. 
+This is a project for the Java Speech API. The program interprets vocal inputs into text and synthesizes voices from text input.
+The program supports dozens of languages and even has the ability to auto-detect languages! 
 
 ## Description
 The J.A.R.V.I.S. Speech API is designed to be simple and efficient, using the speech engines created by Google  

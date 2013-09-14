@@ -179,6 +179,7 @@ public class Recognizer {
     
     /**Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
      * This value is null by default.
+     * @param language The language code.
      */
      @Deprecated
     public void setLanguage(String language) {
@@ -197,7 +198,7 @@ public class Recognizer {
     /**
      * Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
      * This value is null by default.
-     * @return language
+     * @return language the Google language
      */
     public String getLanguage(){
     	return language;

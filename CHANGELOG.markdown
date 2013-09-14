@@ -5,6 +5,12 @@ Changelog corresponds with a tagged and signed Git commit.  This marks the chang
 A tagged commit may or may not have a corresponding binary version available.
 Format:  Tag: `<Corresponding Tag>`
 
+* Version 1.10 (Tag v1.100)
+    * Added new Microphone Analyzer class.
+    * Added volume and frequency detection and frame work for (Voice Activity Detection) 
+    * Microphone API updated to make it more usable.
+    * API re-branded as J.A.R.V.I.S. (Just A Reliable Vocal Interpreter & Synthesiser)
+
 * Version 1.06 (Tag v1.016)
     * Added support for synthesiser for strings longer than 100 characters (Credits to @Skylion007)
     * Added support for synthesiser for multiple languages, accents, and voices. (Credits to @Skylion007)
