@@ -13,28 +13,28 @@ public class Recognizer {
 
     public enum Languages{
 		AUTO_DETECT(null),//tells Google to auto-detect the language
-		ARABIC__JORDAN("ar-JO"),
-		ARABIC__LEBANON("ar-LB"),
-		ARABIC__QATAR("ar-QA"),
-		ARABIC__UAE("ar-AE"),
-		ARABIC__MOROCCO("ar-MA"),
-		ARABIC__IRAQ("ar-IQ"),
-		ARABIC__ALGERIA("ar-DZ"),
-		ARABIC__BAHRAIN("ar-BH"),
-		ARABIC__LYBIA("ar-LY"),
-		ARABIC__OMAN("ar-OM"),
-		ARABIC__SAUDI_ARABIA("ar-SA"),
-		ARABIC__TUNISIA("ar-TN"),
-		ARABIC__YEMEN("ar-YE"),
+		ARABIC_JORDAN("ar-JO"),
+		ARABIC_LEBANON("ar-LB"),
+		ARABIC_QATAR("ar-QA"),
+		ARABIC_UAE("ar-AE"),
+		ARABIC_MOROCCO("ar-MA"),
+		ARABIC_IRAQ("ar-IQ"),
+		ARABIC_ALGERIA("ar-DZ"),
+		ARABIC_BAHRAIN("ar-BH"),
+		ARABIC_LYBIA("ar-LY"),
+		ARABIC_OMAN("ar-OM"),
+		ARABIC_SAUDI_ARABIA("ar-SA"),
+		ARABIC_TUNISIA("ar-TN"),
+		ARABIC_YEMEN("ar-YE"),
 		BASQUE("eu"),
 		CATALAN("ca"),
 		CZECH("cs"),
 		DUTCH("nl-NL"),
-		ENGLISH__AUSTRALIA("en-AU"),
-		ENGLISH__CANADA("en-CA"),
-		ENGLISH__INDIA("en-IN"),
-		ENGLISH__NEW_ZEALAND("en-NZ"),
-		ENGLISH__SOUTH_AFRICA("en-ZA"),
+		ENGLISH_AUSTRALIA("en-AU"),
+		ENGLISH_CANADA("en-CA"),
+		ENGLISH_INDIA("en-IN"),
+		ENGLISH_NEW_ZEALAND("en-NZ"),
+		ENGLISH_SOUTH_AFRICA("en-ZA"),
 		ENGLISH_UK("en-GB"),
 		ENGLISH_US("en-US"),
 		FINNISH("fi"),
@@ -53,21 +53,21 @@ public class Recognizer {
 		TRADITIONAL_TAIWAN("zh-TW"),
 		SIMPLIFIED_CHINA("ZH-CN"),
 		SIMPLIFIED_HONG_KONG("zh-HK"),
-		YUE_CHINESE__TRADITIONAL_HONG_KONG("zh-yue"),
+		YUE_CHINESE_TRADITIONAL_HONG_KONG("zh-yue"),
 		MALAYSIAN("ms-MY"),
 		NORWEGIAN("no-NO"),
 		POLISH("pl"),
 		PIG_LATIN("xx-piglatin"),
 		PORTUGUESE("pt-PT"),
-		PORTUGUESE__BRASIL("pt-BR"),
+		PORTUGUESE_BRASIL("pt-BR"),
 		ROMANIAN("ro-RO"),
 		RUSSIAN("ru"),
 		SERBIAN("sr-SP"),
 		SLOVAK("sk"),
-		SPANISH__ARGENTINA("es-AR"),
+		SPANISH_ARGENTINA("es-AR"),
 		SPANISH_BOLIVIA("es-BO"),
-		SPANISH__CHILE("es-CL"),
-		SPANISH__COLOMBIA("es-CO"),
+		SPANISH_CHILE("es-CL"),
+		SPANISH_COLOMBIA("es-CO"),
 		SPANISH_COSTA_RICA("es-CR"),
 		SPANISH_DOMINICAN_REPUBLIC("es-DO"),
 		SPANISH_ECUADOR("es-EC"),
@@ -125,9 +125,18 @@ public class Recognizer {
      * Constructor
      * @param Language
      */
+     @Deprecated
     public Recognizer(String language) {
         this.language = language; 
     }
+    
+    /**
+     * Constructor
+     * @param language The Languages class for the language you want to designate
+     */
+     public Recognizer(Languages language){
+     	this.language = language.languageCode;
+     }
     
     /**
      * Constructor
@@ -142,10 +151,21 @@ public class Recognizer {
      * @param language
      * @param profanityFilter
      */
+     @Deprecated
     public Recognizer(String language, boolean profanityFilter){
     	this.language = language;
     	this.profanityFilter = profanityFilter;
     }
+    
+   /**
+     * Constructor
+     * @param language
+     * @param profanityFilter
+     */
+     public Recognizer(Languages language, boolean profanityFilter){
+     	this.language = language.languageCode;
+     	this.profanityFilter = profanityFilter;
+     }
     
     /**
      * Language: Contains all supported languages for Google Speech to Text. 
@@ -157,10 +177,10 @@ public class Recognizer {
         this.language = language.languageCode;
     }
     
-   /**Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
+    /**Language code.  This language code must match the language of the speech to be recognized. ex. en-US ru-RU
      * This value is null by default.
      */
-    @Deprecated
+     @Deprecated
     public void setLanguage(String language) {
     	this.language = language;
     }
