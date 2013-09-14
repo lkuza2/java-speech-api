@@ -1,6 +1,8 @@
-#Java-Speech-API
+#J.A.R.V.I.S. (Java-Speech-API)
 
-This is the project for the Java Speech API written in Java.
+J.A.R.V.I.S. Speech API: Just A Real Vocal Interpreter and Synthesizer. 
+This is the project for the Java Speech API. Interprets vocal inputs into text and synthesises MP3Data from text input.
+(Think Steven Hawkings)
 
 ## Description
 This API is designed to be simple and efficient, using the speech engines created by Google  
