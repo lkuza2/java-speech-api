@@ -9,11 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
+
+/*******************************************************************************
  * Synthesiser class that connects to Google's unoffical API to retrieve data
  *
  * @author Luke Kuza, Aaron Gokaslan (Skylion)
- */
+ *******************************************************************************/
 public class Synthesiser {
 
 	/**

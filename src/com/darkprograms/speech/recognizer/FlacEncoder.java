@@ -11,10 +11,10 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/**
+/*************************************************************************************************************
  * Class that contains methods to encode Wave files to FLAC files
  * THIS IS THANKS TO THE javaFlacEncoder Project created here: http://sourceforge.net/projects/javaflacencoder/
- */
+ ************************************************************************************************************/
 public class FlacEncoder {
 
     /**

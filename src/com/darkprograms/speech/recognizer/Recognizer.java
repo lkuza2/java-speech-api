@@ -4,11 +4,11 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 
-/**
+/***************************************************************
  * Class that submits FLAC audio and retrieves recognized text
  *
  * @author Luke Kuza, Duncan Jauncey, Aaron Gokaslan
- */
+ **************************************************************/
 public class Recognizer {
 
     public enum Languages{

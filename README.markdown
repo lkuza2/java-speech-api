@@ -1,6 +1,6 @@
 #J.A.R.V.I.S. (Java-Speech-API)
 
-J.A.R.V.I.S. Speech API: Just A Reliable Vocal Interpreter & Synthesizer. 
+J.A.R.V.I.S. Java Speech API: Just A Reliable Vocal Interpreter & Synthesizer. 
 This is a project for the Java Speech API. The program interprets vocal inputs into text and synthesizes voices from text input.
 The program supports dozens of languages and even has the ability to auto-detect languages! 
 

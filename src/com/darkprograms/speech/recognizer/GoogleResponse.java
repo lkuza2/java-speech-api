@@ -3,11 +3,11 @@ package com.darkprograms.speech.recognizer;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
+/******************************************************************************
  * Class that holds the response and confidence of a Google recognizer request
  *
  * @author Luke Kuza, Duncan Jauncey, Aaron Gokaslan
- */
+ ******************************************************************************/
 public class GoogleResponse {
 
     /**

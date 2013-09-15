@@ -3,12 +3,13 @@ package com.darkprograms.speech.microphone;
 import javax.sound.sampled.AudioFileFormat;
 import com.darkprograms.speech.utility.*;
 
-/**
+/********************************************************************************************
  * Microphone Analyzer class, detects pitch and volume while extending the microphone class.
  * Implemented as a precursor to a Voice Activity Detection (VAD) algorithm.
  * Currently can be used for audio data analysis.
  * Dependencies: FFT.java & Complex.java. Both found in the utility package.
- */
+ * @author Aaron Gokaslan
+ ********************************************************************************************/
 
 public class MicrophoneAnalyzer extends Microphone {
 
@@ -111,7 +112,7 @@ public class MicrophoneAnalyzer extends Microphone {
 	 */
 	public int getFrequency(){
 		try {
-			return getFrequency(1024);
+			return getFrequency(2048);
 		} catch (Exception e) {
 			//This will never happen. Ever...
 			return -666;
