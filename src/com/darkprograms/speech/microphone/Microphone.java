@@ -180,7 +180,7 @@ public class Microphone {
         if(getTargetDataLine()==null){
         	initTargetDataLine();
         }
-    	if(!getTargetDataLine().isOpen() && getState()==CaptureState.CLOSED){
+    	if(!getTargetDataLine().isOpen()){
         	try {
                 setState(CaptureState.PROCESSING_AUDIO);
         		getTargetDataLine().open(getAudioFormat());
