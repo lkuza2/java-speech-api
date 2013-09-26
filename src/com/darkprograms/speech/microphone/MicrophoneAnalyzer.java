@@ -1,7 +1,7 @@
 package com.darkprograms.speech.microphone;
 
 import javax.sound.sampled.AudioFileFormat;
-import com.darkprograms.speech.utility.*;
+import com.darkprograms.speech.util.*;
 
 /********************************************************************************************
  * Microphone Analyzer class, detects pitch and volume while extending the microphone class.

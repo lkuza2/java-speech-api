@@ -1,4 +1,4 @@
-package com.darkprograms.speech.utility;
+package com.darkprograms.speech.util;
 
 
 /*************************************************************************
