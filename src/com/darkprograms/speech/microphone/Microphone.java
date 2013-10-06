@@ -142,8 +142,10 @@ public class Microphone {
         File file = new File(audioFile);
         setAudioFile(file);
 
-        DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
-        setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
+        if(getTargetDataLine()==null){
+            DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
+            setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
+        }
 
 
         //Get Audio
@@ -180,8 +182,8 @@ public class Microphone {
         if(getTargetDataLine()==null){
         	initTargetDataLine();
         }
-    	if(!getTargetDataLine().isOpen()){
-        	try {
+        if(!getTargetDataLine().isOpen() && !getTargetDataLine().isRunning() && !getTargetDataLine().isActive()){
+           	try {
                 setState(CaptureState.PROCESSING_AUDIO);
         		getTargetDataLine().open(getAudioFormat());
             	getTargetDataLine().start();
