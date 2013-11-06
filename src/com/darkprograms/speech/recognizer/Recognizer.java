@@ -3,6 +3,7 @@ package com.darkprograms.speech.recognizer;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 
 /***************************************************************
  * Class that submits FLAC audio and retrieves recognized text
@@ -418,7 +419,7 @@ public class Recognizer {
         outputStream.close();
 
         // Get response data.
-        br = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+        br = new BufferedReader(new InputStreamReader(urlConn.getInputStream(), Charset.forName("UTF-8")));
 
         String response = br.readLine();
 
