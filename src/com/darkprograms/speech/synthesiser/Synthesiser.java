@@ -41,6 +41,8 @@ public class Synthesiser {
 	public static final String LANG_ES_SPANISH = "es";
 	public static final String LANG_FR_FRENCH = "fr";
 	public static final String LANG_DE_GERMAN = "de";
+	public static final String LANG_PT_PORTUGUESE = "pt-pt";
+	public static final String LANG_PT_BRAZILIAN = "pt-br";
 	//Please add on more regional languages as you find them. Also try to include the accent code if you can can.
 
 	/**
