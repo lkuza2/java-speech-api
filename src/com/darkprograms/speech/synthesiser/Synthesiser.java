@@ -213,15 +213,6 @@ public class Synthesiser {
 	 * @throws Exception if it cannot complete the request
 	 */
 	public String detectLanguage(String text) throws Exception{
-		if(text.length()>99){//Google will not compute more than 99 characters
-			int lastWord = findLastWord(text);
-			if(lastWord<0){
-				text = text.substring(0,99);//Fix for languages without spaces. 
-			}
-			else{
-				text = text.substring(0,lastWord);//We don't need the whole text to determine language
-			}
-		}
 		String encoded = URLEncoder.encode(text, "UTF-8"); //Encode
 		URL url = new URL(GOOGLE_AUTODETECT_URL + encoded); //Generates URL
 		URLConnection urlConn = url.openConnection(); //Open connection
