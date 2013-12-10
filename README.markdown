@@ -21,6 +21,7 @@ The API currently provides the following functionality,
   * A speech synthesiser using Google's synthesizer service
       * Retrieves synthesized text in an InputStream (MP3 data ready to be played)
   * Wave to FLAC API (Wrapped around the used API in the project, javaFlacEncoder, see CREDITS)
+  * A translator using Google Translate (courtesy of Skylion's Google Toolkit)
 
 ##Changelog
 See CHANGELOG.markdown for Version History/Changelog

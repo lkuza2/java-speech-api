@@ -1,12 +1,13 @@
 package com.darkprograms.speech.synthesiser;
 
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.darkprograms.speech.translator.GoogleTranslate;
 
 
 
@@ -21,11 +22,6 @@ public class Synthesiser {
 	 * URL to query for Google synthesiser
 	 */
 	private final static String GOOGLE_SYNTHESISER_URL = "http://translate.google.com/translate_tts?tl=";
-
-	/**
-	 * URL to query for Google Auto Detection
-	 */
-	private final static String GOOGLE_AUTODETECT_URL = "http://translate.google.com/translate_a/t?client=t&sl=auto&text=";
 
 	/**
 	 * language of the Text you want to translate
@@ -100,7 +96,7 @@ public class Synthesiser {
 				languageCode = "en-us";//Reverts to Default Language if it can't detect it.
 			}
 		}
-		
+
 		if(synthText.length()>100){
 			List<String> fragments = parseString(synthText);//parses String if too long
 			String tmp = getLanguage();
@@ -209,88 +205,11 @@ public class Synthesiser {
 	/**
 	 * Automatically determines the language of the original text
 	 * @param text represents the text you want to check the language of
-	 * @return the languageCode
+	 * @return the languageCode in ISO-639
 	 * @throws Exception if it cannot complete the request
 	 */
 	public String detectLanguage(String text) throws Exception{
-		String encoded = URLEncoder.encode(text, "UTF-8"); //Encode
-		URL url = new URL(GOOGLE_AUTODETECT_URL + encoded); //Generates URL
-		URLConnection urlConn = url.openConnection(); //Open connection
-		urlConn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:2.0) Gecko/20100101 Firefox/4.0"); //Adding header for user agent is required
-		String rawData = urlToText(urlConn);//Gets text from Google
-		if(!isLanguageSupported(rawData))
-			return null;//Comment this if statement out if you want to use this code for rare languages like Maori.
-		return parseRawData(rawData);
-	}
-
-	/**
-	 * Converts a URL Connection to Text
-	 * @param urlConn The Open URLConnection that you want to generate a String from
-	 * @return The generated String
-	 * @throws Exception if it cannot complete the request
-	 */
-	private String urlToText(URLConnection urlConn) throws Exception{
-		Reader r = new java.io.InputStreamReader(urlConn.getInputStream());//Gets Data Converts to string
-		StringBuilder buf = new StringBuilder();
-		while (true) {
-			int ch = r.read();
-			if (ch < 0)
-				break;
-			buf.append((char) ch);
-		}
-		String str = buf.toString();
-		return str;
-	}
-
-	/**
-	 * Searches RawData for Language & region if possible
-	 * @param RawData the raw String directly from Google you want to search through
-	 * @return The language parsed from the rawData or null if Google cannot determine it.
-	 */
-	private String parseRawData(String rawData){
-		for(int i = 0; i+5<rawData.length(); i++){
-			boolean dashDetected = rawData.charAt(i+4)=='-';//Sometimes Google will detect the region too.
-			if(rawData.charAt(i)==','  && rawData.charAt(i+1)== '"' 
-					&& ((rawData.charAt(i+4)=='"' && rawData.charAt(i+5)==',')
-							|| dashDetected)){
-				if(dashDetected){//If region is detected parses the whole string!
-					int lastQuote = rawData.substring(i+2).indexOf('"');//Where the region ends
-					if(lastQuote>0)
-						return rawData.substring(i+2,i+2+lastQuote);
-				}
-				else{
-					String possible = rawData.substring(i+2,i+4);
-					if(containsLettersOnly(possible)){//Required due to Google's inconsistent formatting.
-						//System.out.println(possible);
-						return possible;
-					}
-				}
-			}
-		}//End of Loop
-		return null;
-	}
-
-	/**
-	 * Checks if all characters in text are letters.  
-	 * @param text The text you want to determine the validity of.
-	 * @return True if all characters are letters, otherwise false.
-	 */
-	private boolean containsLettersOnly(String text){
-		for(int i = 0; i<text.length(); i++){
-			if(!Character.isLetter(text.charAt(i))){
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	/**
-	 * Check is a language is supported from rawData
-	 * @param rawData Checks if a language is supported based off of rawData
-	 * @return true if supported otherwise false.
-	 */
-	private boolean isLanguageSupported(String rawData){
-		return !rawData.contains(",\"We are not yet able to translate from ");
+		return GoogleTranslate.detectLanguage(text);
 	}
 }
 
