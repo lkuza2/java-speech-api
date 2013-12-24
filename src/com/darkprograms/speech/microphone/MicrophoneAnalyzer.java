@@ -112,7 +112,7 @@ public class MicrophoneAnalyzer extends Microphone {
 	 */
 	public int getFrequency(){
 		try {
-			return getFrequency(2048);
+			return getFrequency(4096);
 		} catch (Exception e) {
 			//This will never happen. Ever...
 			return -666;
@@ -139,47 +139,91 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * @param bytes The audioData you want to analyze
 	 * @return The calculated frequency in Hertz.
 	 */
-	private int getFrequency(byte[] bytes){//This method requires an AudioFormat and cannot be static.
+	public int getFrequency(byte[] bytes){
 		double[] audioData = this.bytesToDoubleArray(bytes);
+		audioData = applyHanningWindow(audioData);
 		Complex[] complex = new Complex[audioData.length];
 		for(int i = 0; i<complex.length; i++){
 			complex[i] = new Complex(audioData[i], 0);
 		}
 		Complex[] fftTransformed = FFT.fft(complex);
-		return calculateFundamentalFrequency(fftTransformed);
+		return this.calculateFundamentalFrequency(fftTransformed, 4);
 	}
 	
 	/**
-	 * Iterates through the transformed data to calculate the frequency
-	 * This data is only as accurate as the bin size. (See getBinSize(int))
-	 * Fundamental Frequency = index of max magnitude (that isn't a harmotic) * bin size
-	 * @param fftData The data you want to analyze
-	 * @return The frequency in Hertz
+	 * Applies a Hanning Window to the data set.
+	 * Hanning Windows are used to increase the accuracy of the FFT.
+	 * One should always apply a window to a dataset before applying an FFT
+	 * @param The data you want to apply the window to
+	 * @return The windowed data set
 	 */
-	private int calculateFundamentalFrequency(Complex[] fftData){
-		int index = -1;
-		double max = Double.MIN_VALUE;
-		for(int i = 0; i<fftData.length/2; i++){
-			Complex complex = fftData[i];
-			double tmp = complex.getMagnitude();
-			if(tmp>max && !isHarmonic(i,index)){
-				max = tmp;
-				index = i;
+	private double[] applyHanningWindow(double[] data){
+		return applyHanningWindow(data, 0, data.length);
+	}
+
+	/**
+	 * Applies a Hanning Window to the data set.
+	 * Hanning Windows are used to increase the accuracy of the FFT.
+	 * One should always apply a window to a dataset before applying an FFT
+	 * @param The data you want to apply the window to
+	 * @param The starting index you want to apply a window from
+	 * @param The size of the window
+	 * @return The windowed data set
+	 */
+	private double[] applyHanningWindow(double[] signal_in, int pos, int size){
+		for (int i = pos; i < pos + size; i++){
+			int j = i - pos; // j = index into Hann window function
+			signal_in[i] = (double)(signal_in[i] * 0.5 * (1.0 - Math.cos(2.0 * Math.PI * j / size)));
+		}
+		return signal_in;
+	}
+
+
+	/**
+	 * This method calculates the fundamental frequency using Harmonic Product Specturm
+	 * It down samples the FFTData four times and multiplies the arrays
+	 * together to determine the fundamental frequency. This is slightly more computationally
+	 * expensive, but much more accurate. In simpler terms, the function will remove the harmonic frequencies
+	 * which occur at every N value by finding the lowest common divisor among them.
+	 * @param fftData The array returned by the FFT
+	 * @param N the number of times you wish to downsample.
+	 * WARNING: The more times you downsample, the lower the maximum detectable frequency is.
+	 * @return The fundamental frequency in Hertz
+	 */
+	private int calculateFundamentalFrequency(Complex[] fftData, int N){
+		if(N<=0 || fftData == null){ return -1; } //error case
+		
+		final int LENGTH = fftData.length;//Used to calculate bin size
+		fftData = removeNegativeFrequencies(fftData);
+		Complex[][] data = new Complex[N][fftData.length/N];
+		for(int i = 0; i<N; i++){
+			for(int j = 0; j<data[0].length; j++){
+				data[i][j] = fftData[j*(i+1)];
 			}
 		}
-		return index*getFFTBinSize(fftData.length);
+		Complex[] result = new Complex[fftData.length/N];//Combines the arrays
+		for(int i = 0; i<result.length; i++){
+			Complex tmp = new Complex(1,0);
+			for(int j = 0; j<N; j++){
+				tmp = tmp.times(data[j][i]);
+			}
+			result[i] = tmp;
+		}
+		int index = this.findMaxMagnitude(result);
+		return index*getFFTBinSize(LENGTH);
 	}
-	
+
 	/**
-	 * Determines whether or not a specific index constitutes a harmonic of a previous instance.
-	 * Science: A harmonic frequency is a multiple of the fundamental frequency caused by interference.
-	 * Note: Frequencies of an index 1 won't be treated as such since its frequency is so low.
-	 * @param currentIndex The suspected harmonic frequency
-	 * @param proposedIndex The suspected fundamental frequency
-	 * @return True if it is a haromonic, false if it's not.
+	 * Removes useless data from transform since sound doesn't use complex numbers.
+	 * @param The data you want to remove the complex transforms from
+	 * @return The cleaned data
 	 */
-	private boolean isHarmonic(int currentIndex, int proposedIndex){
-		return (currentIndex>2 && proposedIndex>2 && currentIndex%proposedIndex==0);
+	private Complex[] removeNegativeFrequencies(Complex[] c){
+		Complex[] out = new Complex[c.length/2];
+		for(int i = 0; i<out.length; i++){
+			out[i] = c[i];
+		}
+		return out;
 	}
 	
 	/**
@@ -192,6 +236,26 @@ public class MicrophoneAnalyzer extends Microphone {
 	 */
 	private int getFFTBinSize(int fftDataLength){
 		return (int)(getAudioFormat().getSampleRate()/fftDataLength+.5);
+	}
+
+	/**
+	 * Calculates index of the maximum magnitude in a complex array.
+	 * @param The Complex[] you want to get max magnitude from.
+	 * @return The index of the max magnitude
+	 */
+	private int findMaxMagnitude(Complex[] input){
+		//Calculates Maximum Magnitude of the array
+		double max = Double.MIN_VALUE;
+		int index = -1;
+		for(int i = 0; i<input.length; i++){
+			Complex c = input[i];
+			double tmp = c.getMagnitude();
+			if(tmp>max){
+				max = tmp;;
+				index = i;
+			}
+		}
+		return index;
 	}
 	
 	/**
