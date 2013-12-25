@@ -206,7 +206,7 @@ public class Recognizer {
     }
 
     /**
-     * Get recognized data from a Wave file.  This method will encode the wave file to a FLAC
+     * Get recognized data from a Wave file.  This method will encode the wave file to a FLAC file
      *
      * @param waveFile Wave file to recognize
      * @param maxResults Maximum number of results to return in response
@@ -320,10 +320,10 @@ public class Recognizer {
      * Parses the raw response from Google
      *
      * @param rawResponse The raw, unparsed response from Google
-     * @return Returns the parsed response.  Index 0 is response, Index 1 is confidence score
+     * @return Returns the parsed response in the form of a Google Response.
      */
     private void parseResponse(String rawResponse, GoogleResponse googleResponse) {
-        if (!rawResponse.contains("utterance"))
+        if (rawResponse == null || !rawResponse.contains("utterance"))
             return;
 
         String array = substringBetween(rawResponse, "[", "]");
