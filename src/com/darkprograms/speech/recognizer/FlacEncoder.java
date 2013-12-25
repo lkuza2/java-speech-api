@@ -1,3 +1,5 @@
+package com.darkprograms.speech.recognizer;
+
 import javaFlacEncoder.FLACEncoder;
 import javaFlacEncoder.FLACFileOutputStream;
 import javaFlacEncoder.StreamConfiguration;
