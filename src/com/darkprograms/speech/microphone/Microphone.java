@@ -2,6 +2,7 @@ package com.darkprograms.speech.microphone;
 
 import javax.sound.sampled.*;
 
+import java.io.Closeable;
 import java.io.File;
 
 /***************************************************************************
@@ -9,7 +10,7 @@ import java.io.File;
  *
  * @author Luke Kuza, Aaron Gokaslan
  ***************************************************************************/
-public class Microphone {
+public class Microphone implements Closeable{
 	
     /**
      * TargetDataLine variable to receive data from microphone
@@ -115,9 +116,10 @@ public class Microphone {
      * Captures audio from the microphone and saves it a file
      *
      * @param audioFile The File to save the audio to
+     * @throws LineUnavailableException 
      * @throws Exception Throws an exception if something went wrong
      */
-    public void captureAudioToFile(File audioFile) throws Exception {
+    public void captureAudioToFile(File audioFile) throws LineUnavailableException {
         setState(CaptureState.STARTING_CAPTURE);
         setAudioFile(audioFile);
 
@@ -135,9 +137,10 @@ public class Microphone {
      * Captures audio from the microphone and saves it a file
      *
      * @param audioFile The fully path (String) to a file you want to save the audio in
+     * @throws LineUnavailableException 
      * @throws Exception Throws an exception if something went wrong
      */
-    public void captureAudioToFile(String audioFile) throws Exception {
+    public void captureAudioToFile(String audioFile) throws LineUnavailableException {
         setState(CaptureState.STARTING_CAPTURE);
         File file = new File(audioFile);
         setAudioFile(file);
