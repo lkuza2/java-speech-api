@@ -13,7 +13,7 @@ import java.nio.charset.Charset;
 public class Recognizer {
 
     public enum Languages{
-		AUTO_DETECT(null),//tells Google to auto-detect the language
+		AUTO_DETECT("auto"),//tells Google to auto-detect the language
 		ARABIC_JORDAN("ar-JO"),
 		ARABIC_LEBANON("ar-LB"),
 		ARABIC_QATAR("ar-QA"),
@@ -119,6 +119,7 @@ public class Recognizer {
      * Constructor
      */
     public Recognizer() {
+    	this.setLanguage(Languages.AUTO_DETECT);
     }
     
     /**
