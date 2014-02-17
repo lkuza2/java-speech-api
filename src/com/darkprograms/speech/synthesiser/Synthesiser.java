@@ -79,8 +79,7 @@ public class Synthesiser {
 	 *
 	 * @param synthText Text you want to be synthesized into MP3 data
 	 * @return Returns an input stream of the MP3 data that is returned from Google
-	 * @throws IOException 
-	 * @throws Exception Throws exception if it can not complete the request
+	 * @throws IOException Throws exception if it can not complete the request
 	 */
 	public InputStream getMP3Data(String synthText) throws IOException{
 
@@ -125,8 +124,7 @@ public class Synthesiser {
 	 * Gets an InputStream to MP3Data for the returned information from a request
 	 * @param synthText List of Strings you want to be synthesized into MP3 data
 	 * @return Returns an input stream of all the MP3 data that is returned from Google
-	 * @throws IOException 
-	 * @throws Exception Throws exception if it cannot complete the request
+	 * @throws IOException Throws exception if it cannot complete the request
 	 */
 	public InputStream getMP3Data(List<String> synthText) throws IOException{
 		InputStream complete = getMP3Data(synthText.remove(0));
@@ -210,7 +208,7 @@ public class Synthesiser {
 	 * @return the languageCode in ISO-639
 	 * @throws Exception if it cannot complete the request
 	 */
-	public String detectLanguage(String text) throws Exception{
+	public String detectLanguage(String text) throws IOException{
 		return GoogleTranslate.detectLanguage(text);
 	}
 }

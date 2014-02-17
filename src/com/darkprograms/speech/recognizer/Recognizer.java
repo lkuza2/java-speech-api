@@ -13,7 +13,7 @@ import java.nio.charset.Charset;
 public class Recognizer {
 
     public enum Languages{
-		AUTO_DETECT(null),//tells Google to auto-detect the language
+		AUTO_DETECT("auto"),//tells Google to auto-detect the language
 		ARABIC_JORDAN("ar-JO"),
 		ARABIC_LEBANON("ar-LB"),
 		ARABIC_QATAR("ar-QA"),
@@ -211,8 +211,7 @@ public class Recognizer {
      * @param waveFile Wave file to recognize
      * @param maxResults Maximum number of results to return in response
      * @return Returns a GoogleResponse, with the response and confidence score
-     * @throws IOException 
-     * @throws Exception Throws exception if something goes wrong
+     * @throws IOException Throws exception if something goes wrong
      */
     public GoogleResponse getRecognizedDataForWave(File waveFile, int maxResults) throws IOException{
         FlacEncoder flacEncoder = new FlacEncoder();
@@ -236,9 +235,9 @@ public class Recognizer {
      * @param waveFile Wave file to recognize
      * @param maxResults the maximum number of results to return in the response
      * @return Returns a GoogleResponse, with the response and confidence score
-     * @throws Exception Throws exception if something goes wrong
+     * @throws IOException Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForWave(String waveFile, int maxResults) throws Exception {
+    public GoogleResponse getRecognizedDataForWave(String waveFile, int maxResults) throws IOException {
         return getRecognizedDataForWave(new File(waveFile), maxResults);
     }
 
@@ -248,9 +247,9 @@ public class Recognizer {
      * @param flacFile FLAC file to recognize
      * @param maxResults the maximum number of results to return in the response
      * @return Returns a GoogleResponse, with the response and confidence score
-     * @throws Exception Throws exception if something goes wrong
+     * @throws IOException Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForFlac(File flacFile, int maxResults) throws Exception {
+    public GoogleResponse getRecognizedDataForFlac(File flacFile, int maxResults) throws IOException {
         String response = rawRequest(flacFile, maxResults);
         GoogleResponse googleResponse = new GoogleResponse();
         parseResponse(response, googleResponse);
@@ -263,9 +262,9 @@ public class Recognizer {
      * @param flacFile FLAC file to recognize
      * @param maxResults the maximum number of results to return in the response
      * @return Returns a GoogleResponse, with the response and confidence score
-     * @throws Exception Throws exception if something goes wrong
+     * @throws IOException Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForFlac(String flacFile, int maxResults) throws Exception {
+    public GoogleResponse getRecognizedDataForFlac(String flacFile, int maxResults) throws IOException {
         return getRecognizedDataForFlac(new File(flacFile), maxResults);
     }
 
@@ -275,9 +274,9 @@ public class Recognizer {
      *
      * @param waveFile Wave file to recognize
      * @return Returns a GoogleResponse, with the response and confidence score
-     * @throws Exception Throws exception if something goes wrong
+     * @throws IOException Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForWave(File waveFile) throws Exception {
+    public GoogleResponse getRecognizedDataForWave(File waveFile) throws IOException {
         return getRecognizedDataForWave(waveFile, 1);
     }
 
@@ -287,9 +286,9 @@ public class Recognizer {
      *
      * @param waveFile Wave file to recognize
      * @return Returns a GoogleResponse, with the response and confidence score
-     * @throws Exception Throws exception if something goes wrong
+     * @throws IOException Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForWave(String waveFile) throws Exception {
+    public GoogleResponse getRecognizedDataForWave(String waveFile) throws IOException {
         return getRecognizedDataForWave(waveFile, 1);
     }
 
@@ -299,9 +298,9 @@ public class Recognizer {
      *
      * @param flacFile FLAC file to recognize
      * @return Returns a GoogleResponse, with the response and confidence score
-     * @throws Exception Throws exception if something goes wrong
+     * @throws IOException Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForFlac(File flacFile) throws Exception {
+    public GoogleResponse getRecognizedDataForFlac(File flacFile) throws IOException {
         return getRecognizedDataForFlac(flacFile, 1);
     }
 
@@ -311,9 +310,9 @@ public class Recognizer {
      *
      * @param flacFile FLAC file to recognize
      * @return Returns a GoogleResponse, with the response and confidence score
-     * @throws Exception Throws exception if something goes wrong
+     * @throws IOException Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForFlac(String flacFile) throws Exception {
+    public GoogleResponse getRecognizedDataForFlac(String flacFile) throws IOException {
         return getRecognizedDataForFlac(flacFile, 1);
     }
 
@@ -369,8 +368,7 @@ public class Recognizer {
      *
      * @param inputFile Input files to recognize
      * @return Returns the raw, unparsed response from Google
-     * @throws IOException 
-     * @throws Exception Throws exception if something went wrong
+     * @throws IOException Throws exception if something went wrong
      */
     private String rawRequest(File inputFile, int maxResults) throws IOException{
         URL url;

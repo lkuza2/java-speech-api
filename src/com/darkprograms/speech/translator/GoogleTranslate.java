@@ -1,5 +1,6 @@
 package com.darkprograms.speech.translator;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -43,9 +44,9 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 	 * Automatically determines the language of the original text
 	 * @param text represents the text you want to check the language of
 	 * @return The ISO-639 code for the language
-	 * @throws Exception if it cannot complete the request
+	 * @throws IOException if it cannot complete the request
 	 */
-	public static String detectLanguage(String text) throws Exception{
+	public static String detectLanguage(String text) throws IOException{
 		String encoded = URLEncoder.encode(text, "UTF-8"); //Encodes the string
 		URL url = new URL(GOOGLE_TRANSLATE_URL + encoded); //Generates URL
 		String rawData = urlToText(url);//Gets text from Google
@@ -58,9 +59,9 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 	 * Useful for creating international applications as you can translate UI strings
 	 * @param text The text you want to translate
 	 * @return The translated text
-	 * @throws Exception if cannot complete request
+	 * @throws IOException if cannot complete request
 	 */
-	public static String translate(String text) throws Exception{
+	public static String translate(String text) throws IOException{
 		return translate(Locale.getDefault().getLanguage(), text);
 	}
 	
@@ -69,9 +70,9 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 	 * @param targetLanguage The language you want to translate into in ISO-639 format
 	 * @param text The text you actually want to translate 
 	 * @return The translated text.
-	 * @throws Exception if it cannot complete the request 	
+	 * @throws IOException if it cannot complete the request 	
 	 */
-	public static String translate(String targetLanguage, String text) throws Exception{
+	public static String translate(String targetLanguage, String text) throws IOException{
 		return translate("auto",targetLanguage, text);
 	}
 	
@@ -82,9 +83,9 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 	 * @param targetLanguage The language you want to translate into in ISO-639 format
 	 * @param text The text you actually want to translate 
 	 * @return the translated text.
-	 * @throws Exception if it cannot complete the request
+	 * @throws IOException if it cannot complete the request
 	 */
-	public static String translate(String sourceLanguage, String targetLanguage, String text) throws Exception{
+	public static String translate(String sourceLanguage, String targetLanguage, String text) throws IOException{
 		String encoded = URLEncoder.encode(text, "UTF-8"); //Encode
 		//Generates URL
 		URL url = new URL(GOOGLE_TRANSLATE_URL + "&sl=" + sourceLanguage + "&tl=" + targetLanguage +  "&text=" + encoded); 
@@ -103,9 +104,9 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 	 * Converts a URL to Text
 	 * @param url that you want to generate a String from
 	 * @return The generated String
-	 * @throws Exception if it cannot complete the request
+	 * @throws IOException if it cannot complete the request
 	 */
-	private static String urlToText(URL url) throws Exception{
+	private static String urlToText(URL url) throws IOException{
 		URLConnection urlConn = url.openConnection(); //Open connection
 		//Adding header for user agent is required. Otherwise, Google rejects the request
 		urlConn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:2.0) Gecko/20100101 Firefox/4.0"); 
