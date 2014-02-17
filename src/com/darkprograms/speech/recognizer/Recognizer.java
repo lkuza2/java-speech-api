@@ -13,7 +13,7 @@ import java.nio.charset.Charset;
 public class Recognizer {
 
     public enum Languages{
-		AUTO_DETECT("auto"),//tells Google to auto-detect the language
+		AUTO_DETECT(null),//tells Google to auto-detect the language
 		ARABIC_JORDAN("ar-JO"),
 		ARABIC_LEBANON("ar-LB"),
 		ARABIC_QATAR("ar-QA"),
@@ -211,9 +211,10 @@ public class Recognizer {
      * @param waveFile Wave file to recognize
      * @param maxResults Maximum number of results to return in response
      * @return Returns a GoogleResponse, with the response and confidence score
+     * @throws IOException 
      * @throws Exception Throws exception if something goes wrong
      */
-    public GoogleResponse getRecognizedDataForWave(File waveFile, int maxResults) throws Exception {
+    public GoogleResponse getRecognizedDataForWave(File waveFile, int maxResults) throws IOException{
         FlacEncoder flacEncoder = new FlacEncoder();
         File flacFile = new File(waveFile + ".flac");
 
@@ -368,9 +369,10 @@ public class Recognizer {
      *
      * @param inputFile Input files to recognize
      * @return Returns the raw, unparsed response from Google
+     * @throws IOException 
      * @throws Exception Throws exception if something went wrong
      */
-    private String rawRequest(File inputFile, int maxResults) throws Exception {
+    private String rawRequest(File inputFile, int maxResults) throws IOException{
         URL url;
         URLConnection urlConn;
         OutputStream outputStream;
@@ -380,6 +382,9 @@ public class Recognizer {
         if( language != null ) {
             sb.append("&lang=");
             sb.append(language);
+        }
+        else{
+        	sb.append("&lang=auto");
         }
         if( !profanityFilter ) {
             sb.append("&pfilter=0");
