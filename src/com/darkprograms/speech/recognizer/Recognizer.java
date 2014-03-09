@@ -88,6 +88,8 @@ public class Recognizer {
 		TURKISH("tr"),
 		ZULU("zu");
 	    
+		//TODO Clean Up JavaDoc for Overloaded Methods using @link
+		
 	    /**
 	     *Stores the LanguageCode
 	     */
@@ -219,7 +221,7 @@ public class Recognizer {
 
         flacEncoder.convertWaveToFlac(waveFile, flacFile);
 
-        String response = rawRequest(flacFile, maxResults);
+        String response = rawRequest(flacFile, maxResults, 8000);//Transcodes to 8000 automatically
 
         //Delete converted FLAC data
         flacFile.delete();
@@ -234,6 +236,7 @@ public class Recognizer {
      *
      * @param waveFile Wave file to recognize
      * @param maxResults the maximum number of results to return in the response
+     * NOTE: Sample rate of file must be 8000 unless a custom sample rate is specified.
      * @return Returns a GoogleResponse, with the response and confidence score
      * @throws IOException Throws exception if something goes wrong
      */
@@ -246,16 +249,43 @@ public class Recognizer {
      *
      * @param flacFile FLAC file to recognize
      * @param maxResults the maximum number of results to return in the response
+     * NOTE: Sample rate of file must be 8000 unless a custom sample rate is specified.
      * @return Returns a GoogleResponse, with the response and confidence score
      * @throws IOException Throws exception if something goes wrong
      */
     public GoogleResponse getRecognizedDataForFlac(File flacFile, int maxResults) throws IOException {
-        String response = rawRequest(flacFile, maxResults);
+    	return getRecognizedDataForFlac(flacFile, maxResults, 8000);
+    }
+
+    /**
+     * Get recognized data from a FLAC file.
+     *
+     * @param flacFile FLAC file to recognize
+     * @param maxResults the maximum number of results to return in the response
+     * @param samepleRate The sampleRate of the file. Default is 8000.
+     * @return Returns a GoogleResponse, with the response and confidence score
+     * @throws IOException Throws exception if something goes wrong
+     */
+    public GoogleResponse getRecognizedDataForFlac(File flacFile, int maxResults, int sampleRate) throws IOException{
+        String response = rawRequest(flacFile, maxResults, sampleRate);
         GoogleResponse googleResponse = new GoogleResponse();
         parseResponse(response, googleResponse);
         return googleResponse;
     }
 
+    /**
+     * Get recognized data from a FLAC file.
+     *
+     * @param flacFile FLAC file to recognize
+     * @param maxResults the maximum number of results to return in the response
+     * @param samepleRate The sampleRate of the file. Default is 8000.
+     * @return Returns a GoogleResponse, with the response and confidence score
+     * @throws IOException Throws exception if something goes wrong
+     */
+    public GoogleResponse getRecognizedDataForFlac(String flacFile, int maxResults, int sampleRate) throws IOException{
+    	return getRecognizedDataForFlac(new File(flacFile), maxResults, sampleRate);
+    }
+    
     /**
      * Get recognized data from a FLAC file.
      *
@@ -370,7 +400,7 @@ public class Recognizer {
      * @return Returns the raw, unparsed response from Google
      * @throws IOException Throws exception if something went wrong
      */
-    private String rawRequest(File inputFile, int maxResults) throws IOException{
+    private String rawRequest(File inputFile, int maxResults, int sampleRate) throws IOException{
         URL url;
         URLConnection urlConn;
         OutputStream outputStream;
@@ -404,7 +434,7 @@ public class Recognizer {
         urlConn.setUseCaches(false);
 
         // Specify the header content type.
-        urlConn.setRequestProperty("Content-Type", "audio/x-flac; rate=8000");
+        urlConn.setRequestProperty("Content-Type", "audio/x-flac; rate=" + sampleRate);
 
         // Send POST output.
         outputStream = urlConn.getOutputStream();
