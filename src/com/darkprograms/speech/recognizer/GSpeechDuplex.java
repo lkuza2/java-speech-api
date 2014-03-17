@@ -49,6 +49,10 @@ public class GSpeechDuplex{
 	 */
 	private String API_KEY = "";
 	
+	/**
+	 * User-defined language
+	 */
+	private String language = "auto";
 	
 	/**
 	 * Constructor
@@ -58,6 +62,20 @@ public class GSpeechDuplex{
 	 */
 	public GSpeechDuplex(String API_KEY){
 		this.API_KEY = API_KEY;
+	}
+	
+	/**
+	 * Temporary will be deprecated before release
+	 */
+	public String getLanguage(){
+		return language;
+	}
+	
+	/**
+	 * Temporary will be deprecated before release
+	 */
+	public void setLanguage(String language){
+		this.language = language;
 	}
 	
 	/**
@@ -87,7 +105,8 @@ public class GSpeechDuplex{
 
 		//Generates the Upstream URL
 		final String API_UP_URL = GOOGLE_DUPLEX_SPEECH_BASE + 
-				"up?lang=en-US&lm=dictation&client=chromium&pair=" + PAIR + "&key=" + API_KEY ;
+				"up?lang=" + language + "&lm=dictation&client=chromium&pair=" + PAIR + 
+				"&key=" + API_KEY ;
 
 		//Opens downChannel
 		this.downChannel(API_DOWN_URL);
