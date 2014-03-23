@@ -5,6 +5,13 @@ Changelog corresponds with a tagged and signed Git commit.  This marks the chang
 A tagged commit may or may not have a corresponding binary version available.
 Format:  Tag: `<Corresponding Tag>`
 
+* Version 1.15
+	* Optimized synthesiser class. Massive speed improvements on long input strings!
+	* Added experimental Duplex API in preparation for version 1.2 .
+
+* Version 1.11 (Tag V1.100)
+	* Fixed major bug in Recognizer
+
 * Version 1.10 (Tag v1.100)
     * Added new Microphone Analyzer class.
     * Added volume and frequency detection and frame work for (Voice Activity Detection) 
