@@ -139,7 +139,7 @@ public class Synthesiser {
 		//Uses an executor service pool for concurrency
 		ExecutorService pool = Executors.newFixedThreadPool(synthText.size());
 		//Stores the Future (Data that will be returned in the future)
-		Set<Future<InputStream>> set = new LinkedHashSet<Future<InputStream>>();
+		Set<Future<InputStream>> set = new LinkedHashSet<Future<InputStream>>(synthText.size());
 		for(String part: synthText){ //Iterates through the list
 			Callable<InputStream> callable = new MP3DataFetcher(part);//Creates Callable
 			Future<InputStream> future = pool.submit(callable);//Begins to run Callable
