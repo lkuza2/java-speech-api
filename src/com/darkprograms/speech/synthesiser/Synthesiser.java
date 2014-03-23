@@ -2,11 +2,20 @@ package com.darkprograms.speech.synthesiser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.SequenceInputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import com.darkprograms.speech.translator.GoogleTranslate;
 
@@ -127,11 +136,29 @@ public class Synthesiser {
 	 * @throws IOException Throws exception if it cannot complete the request
 	 */
 	public InputStream getMP3Data(List<String> synthText) throws IOException{
-		InputStream complete = getMP3Data(synthText.remove(0));
-		for(String part: synthText){
-			complete = new java.io.SequenceInputStream(complete, getMP3Data(part));//Concatenate with new MP3 Data
+		//Uses an executor service pool for concurrency
+		ExecutorService pool = Executors.newFixedThreadPool(synthText.size());
+		//Stores the Future (Data that will be returned in the future)
+		Set<Future<InputStream>> set = new LinkedHashSet<Future<InputStream>>();
+		for(String part: synthText){ //Iterates through the list
+			Callable<InputStream> callable = new MP3DataFetcher(part);//Creates Callable
+			Future<InputStream> future = pool.submit(callable);//Begins to run Callable
+			set.add(future);//Adds the response that will be returned to a set.
 		}
-		return complete;
+		List<InputStream> inputStreams = new ArrayList<InputStream>(set.size());
+		for(Future<InputStream> future: set){
+			try {
+				inputStreams.add(future.get());//Gets the returned data from the future.
+			} catch (ExecutionException e) {//Thrown if the MP3DataFetcher encountered an error.
+				Throwable ex = e.getCause();
+				if(ex instanceof IOException){
+					throw (IOException)ex;//Downcasts and rethrows it.
+				}
+			} catch (InterruptedException e){//Will probably never be called, but just in case...
+				Thread.currentThread().interrupt();//Interrupts the thread since something went wrong.
+			}
+		}
+		return new SequenceInputStream(Collections.enumeration(inputStreams));//Sequences the stream.
 	}
 
 	/**
@@ -211,5 +238,24 @@ public class Synthesiser {
 	public String detectLanguage(String text) throws IOException{
 		return GoogleTranslate.detectLanguage(text);
 	}
+
+	/**
+	 * This class is a callable.
+	 * A callable is like a runnable except that it can return data and throw exceptions.
+	 * Useful when using futures. Dramatically improves the speed of execution. 
+	 * @author Aaron Gokaslan (Skylion)
+	 */
+	private class MP3DataFetcher implements Callable<InputStream>{
+		private String synthText;
+		
+		public MP3DataFetcher(String synthText){
+			this.synthText = synthText;
+		}
+		
+		public InputStream call() throws IOException{
+			return getMP3Data(synthText);
+		}
+	}
+
 }
 
