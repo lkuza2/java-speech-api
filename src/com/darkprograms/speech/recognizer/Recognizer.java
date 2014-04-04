@@ -5,6 +5,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 
+import com.darkprograms.speech.util.StringUtil;
+
 /***************************************************************
  * Class that submits FLAC audio and retrieves recognized text
  *
@@ -356,7 +358,7 @@ public class Recognizer {
         if (rawResponse == null || !rawResponse.contains("utterance"))
             return;
 
-        String array = substringBetween(rawResponse, "[", "]");
+        String array = StringUtil.substringBetween(rawResponse, "[", "]");
         String[] parts = array.split("}");
         
         boolean first = true;
@@ -369,8 +371,8 @@ public class Recognizer {
                 String utterance = utterancePart.split(":")[1];
                 String confidence = confidencePart.split(":")[1];
 
-                utterance = stripQuotes(utterance);
-                confidence = stripQuotes(confidence);
+                utterance = StringUtil.stripQuotes(utterance);
+                confidence = StringUtil.stripQuotes(confidence);
 
                 if( utterance.equals("null") ) {
                     utterance = null;
@@ -383,7 +385,7 @@ public class Recognizer {
                 googleResponse.setConfidence(confidence);
             } else {
                 String utterance = s.split(":")[1];
-                utterance = stripQuotes(utterance);
+                utterance = StringUtil.stripQuotes(utterance);
                 if( utterance.equals("null") ) {
                     utterance = null;
                 }
@@ -461,32 +463,5 @@ public class Recognizer {
         return response;
 
     }
-
-    private String substringBetween(String s, String part1, String part2) {
-        String sub = null;
-
-        int i = s.indexOf(part1);
-        int j = s.indexOf(part2, i + part1.length());
-
-        if (i != -1 && j != -1) {
-            int nStart = i + part1.length();
-            sub = s.substring(nStart, j);
-        }
-
-        return sub;
-    }
-
-    private String stripQuotes(String s) {
-        int start = 0;
-        if( s.startsWith("\"") ) {
-            start = 1;
-        }
-        int end = s.length();
-        if( s.endsWith("\"") ) {
-            end = s.length() - 1;
-        }
-        return s.substring(start, end);
-    }
-
 
 }

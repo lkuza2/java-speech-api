@@ -19,6 +19,8 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.ws.http.HTTPException;
 
+import com.darkprograms.speech.util.StringUtil;
+
 /**
  * This class uses Google's V2 Hook. The class is returns a chunked respones so listeners must be used.
  * The class also requires an API-Key (see Constructor) for details. This class is experimental and 
@@ -218,15 +220,15 @@ public class RecognizerChunked {
 	private void parseResponse(String rawResponse, GoogleResponse gr){
 		if(rawResponse == null || !rawResponse.contains("\"result\"")){ return; }
 		if(rawResponse.contains("\"confidence\":")){
-			String confidence = getBetween(rawResponse, "\"confidence\":", "}");
+			String confidence = StringUtil.trimString(rawResponse, "\"confidence\":", "}");
 			gr.setConfidence(confidence);
 		}
 		else{
 			gr.setConfidence(String.valueOf(1d));
 		}
-		String array = getBetween(rawResponse, "[", "]");
+		String array = StringUtil.trimString(rawResponse, "[", "]");
 		if(array.contains("[")){
-			array = getBetween(array, "[", "]");
+			array = StringUtil.trimString(array, "[", "]");
 		}
 		String[] parts = array.split(",");
 		gr.setResponse(parseTranscript(parts[0]));
@@ -245,7 +247,7 @@ public class RecognizerChunked {
 		if(s.endsWith("}")){
 			tmp = tmp.substring(0, tmp.length()-1);
 		}
-		tmp = stripQuotes(tmp);
+		tmp = StringUtil.stripQuotes(tmp);
 		return tmp;
 	}
 
@@ -275,22 +277,4 @@ public class RecognizerChunked {
 		}
 	}
 	
-    private String stripQuotes(String s) {
-        int start = 0;
-        if( s.startsWith("\"") ) {
-            start = 1;
-        }
-        int end = s.length();
-        if( s.endsWith("\"") ) {
-            end = s.length() - 1;
-        }
-        return s.substring(start, end);
-    }
-	
-	private String getBetween(String s, String part1, String part2){
-		String tmp = s.substring(s.indexOf(part1) + part1.length() + 1);
-		tmp = tmp.substring(0, tmp.lastIndexOf(part2));
-		return tmp;
-	}
-
 }

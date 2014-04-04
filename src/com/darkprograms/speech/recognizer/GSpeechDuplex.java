@@ -15,6 +15,8 @@ import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import com.darkprograms.speech.util.StringUtil;
+
 /**
  * A class for using Google's Duplex Speech API. Allows for continuous recognition. Requires an API-Key.
  * A duplex API opens two connections. One to an upstream and one to a downstream. The system allows
@@ -298,15 +300,15 @@ public class GSpeechDuplex{
 		if(rawResponse == null || !rawResponse.contains("\"result\"")
 				|| rawResponse.equals("{\"result\":[]}")){ return; }
 		if(rawResponse.contains("\"confidence\":")){
-			String confidence = getBetween(rawResponse, "\"confidence\":", "}");
+			String confidence = StringUtil.trimString(rawResponse, "\"confidence\":", "}");
 			gr.setConfidence(confidence);
 		}
 		else{
 			gr.setConfidence(String.valueOf(1d));
 		}
-		String array = getBetween(rawResponse, "[", "]");
+		String array = StringUtil.trimString(rawResponse, "[", "]");
 		if(array.contains("[")){
-			array = getBetween(array, "[", "]");
+			array = StringUtil.trimString(array, "[", "]");
 		}
 		String[] parts = array.split(",");
 		gr.setResponse(parseTranscript(parts[0]));
@@ -325,25 +327,7 @@ public class GSpeechDuplex{
 		if(s.endsWith("}")){
 			tmp = tmp.substring(0, tmp.length()-1);
 		}
-		tmp = stripQuotes(tmp);
-		return tmp;
-	}
-	
-    private String stripQuotes(String s) {
-        int start = 0;
-        if( s.startsWith("\"") ) {
-            start = 1;
-        }
-        int end = s.length();
-        if( s.endsWith("\"") ) {
-            end = s.length() - 1;
-        }
-        return s.substring(start, end);
-    }
-	
-	private String getBetween(String s, String part1, String part2){
-		String tmp = s.substring(s.indexOf(part1) + part1.length() + 1);
-		tmp = tmp.substring(0, tmp.lastIndexOf(part2));
+		tmp = StringUtil.stripQuotes(tmp);
 		return tmp;
 	}
 	
