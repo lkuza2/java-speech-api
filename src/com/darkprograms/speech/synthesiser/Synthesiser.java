@@ -136,8 +136,8 @@ public class Synthesiser {
 	 * @throws IOException Throws exception if it cannot complete the request
 	 */
 	public InputStream getMP3Data(List<String> synthText) throws IOException{
-		//Uses an executor service pool for concurrency
-		ExecutorService pool = Executors.newFixedThreadPool(synthText.size());
+		//Uses an executor service pool for concurrency. Limit to 1000 threads max.
+		ExecutorService pool = Executors.newFixedThreadPool(1000);
 		//Stores the Future (Data that will be returned in the future)
 		Set<Future<InputStream>> set = new LinkedHashSet<Future<InputStream>>(synthText.size());
 		for(String part: synthText){ //Iterates through the list
