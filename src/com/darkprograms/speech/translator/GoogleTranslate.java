@@ -48,7 +48,7 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 	 */
 	public static String detectLanguage(String text) throws IOException{
 		String encoded = URLEncoder.encode(text, "UTF-8"); //Encodes the string
-		URL url = new URL(GOOGLE_TRANSLATE_URL + encoded); //Generates URL
+		URL url = new URL(GOOGLE_TRANSLATE_URL + "&text=" + encoded); //Generates URL
 		String rawData = urlToText(url);//Gets text from Google
 		return findLanguage(rawData);
 	}
