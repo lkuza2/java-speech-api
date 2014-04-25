@@ -123,9 +123,9 @@ public class Microphone implements Closeable{
         setState(CaptureState.STARTING_CAPTURE);
         setAudioFile(audioFile);
 
-        DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
-        setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
-
+        if(getTargetDataLine() == null){
+        	initTargetDataLine();
+        }
 
         //Get Audio
         new Thread(new CaptureThread()).start();
