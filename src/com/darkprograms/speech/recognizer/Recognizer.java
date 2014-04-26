@@ -222,14 +222,11 @@ public class Recognizer {
         File flacFile = new File(waveFile + ".flac");
 
         flacEncoder.convertWaveToFlac(waveFile, flacFile);
-
-        String response = rawRequest(flacFile, maxResults, 8000);//Transcodes to 8000 automatically
-
+        
+        GoogleResponse googleResponse = getRecognizedDataForFlac(flacFile, maxResults, 8000);
+        
         //Delete converted FLAC data
         flacFile.delete();
-
-        GoogleResponse googleResponse = new GoogleResponse();
-        parseResponse(response, googleResponse);
         return googleResponse;
     }
 
