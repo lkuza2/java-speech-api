@@ -141,20 +141,8 @@ public class Microphone implements Closeable{
      * @throws Exception Throws an exception if something went wrong
      */
     public void captureAudioToFile(String audioFile) throws LineUnavailableException {
-        setState(CaptureState.STARTING_CAPTURE);
         File file = new File(audioFile);
-        setAudioFile(file);
-
-        if(getTargetDataLine()==null){
-            DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
-            setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
-        }
-
-
-        //Get Audio
-        new Thread(new CaptureThread()).start();
-
-
+        captureAudioToFile(file);
     }
 
 	
