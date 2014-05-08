@@ -300,7 +300,7 @@ public class GSpeechDuplex{
 		if(rawResponse == null || !rawResponse.contains("\"result\"")
 				|| rawResponse.equals("{\"result\":[]}")){ return; }
 		if(rawResponse.contains("\"confidence\":")){
-			String confidence = StringUtil.trimString(rawResponse, "\"confidence\":", "}");
+			String confidence = StringUtil.substringBetween(rawResponse, "\"confidence\":", "}");
 			gr.setConfidence(confidence);
 		}
 		else{
