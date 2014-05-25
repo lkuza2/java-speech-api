@@ -1,5 +1,6 @@
 package com.darkprograms.speech.recognizer;
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -168,7 +169,8 @@ public class RecognizerChunked {
 					byte[] lastr = new byte[buff.remaining()];
 					buff.get(lastr, 0, lastr.length);
 					out.write(lastr);
-					out.close();					
+					out.close();
+					resCode = httpConn.getResponseCode();
 					if(resCode >= HttpURLConnection.HTTP_UNAUTHORIZED){//Stops here if Google doesn't like us/
 						throw new HTTPException(HttpURLConnection.HTTP_UNAUTHORIZED);//Throws
 					}
@@ -220,7 +222,7 @@ public class RecognizerChunked {
 	private void parseResponse(String rawResponse, GoogleResponse gr){
 		if(rawResponse == null || !rawResponse.contains("\"result\"")){ return; }
 		if(rawResponse.contains("\"confidence\":")){
-			String confidence = StringUtil.trimString(rawResponse, "\"confidence\":", "}");
+			String confidence = StringUtil.substringBetween(rawResponse, "\"confidence\":", "}");
 			gr.setConfidence(confidence);
 		}
 		else{
