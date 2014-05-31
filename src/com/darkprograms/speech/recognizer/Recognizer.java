@@ -12,8 +12,10 @@ import com.darkprograms.speech.util.StringUtil;
  *
  * @author Luke Kuza, Duncan Jauncey, Aaron Gokaslan
  **************************************************************/
+@Deprecated
 public class Recognizer {
 
+	@Deprecated
     public enum Languages{
 		AUTO_DETECT("auto"),//tells Google to auto-detect the language
 		ARABIC_JORDAN("ar-JO"),
