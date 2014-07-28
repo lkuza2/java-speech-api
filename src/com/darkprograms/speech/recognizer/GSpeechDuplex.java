@@ -160,8 +160,10 @@ public class GSpeechDuplex{
 		//Generates the Upstream URL
 		final String API_UP_URL = GOOGLE_DUPLEX_SPEECH_BASE + 
 				"up?lang=" + language + "&lm=dictation&client=chromium&pair=" + PAIR + 
-				"&key=" + API_KEY + "&pushback&continuous&interim"; //Tells Google to constantly monitor the stream;
+				"&key=" + API_KEY + "&continuous"; //Tells Google to constantly monitor the stream;
 
+		//TODO Add implementation that sends feedback in real time. Protocol buffers will be necessary.
+		
 		//Opens downChannel
 		this.downChannel(API_DOWN_URL);
 		//Opens upChannel
