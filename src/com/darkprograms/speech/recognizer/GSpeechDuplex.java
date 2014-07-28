@@ -160,7 +160,7 @@ public class GSpeechDuplex{
 		//Generates the Upstream URL
 		final String API_UP_URL = GOOGLE_DUPLEX_SPEECH_BASE + 
 				"up?lang=" + language + "&lm=dictation&client=chromium&pair=" + PAIR + 
-				"&key=" + API_KEY + "&continuous"; //Tells Google to constantly monitor the stream;
+				"&key=" + API_KEY + "&pushback&continuous&interim"; //Tells Google to constantly monitor the stream;
 
 		//Opens downChannel
 		this.downChannel(API_DOWN_URL);
@@ -390,7 +390,7 @@ public class GSpeechDuplex{
 				// do you need the trailer?
 				// NOW you can look at the status.
 				resCode = httpConn.getResponseCode();
-				if (resCode / 100 != 2) {
+				if (resCode / 100 != 2)  {
 					System.out.println("ERROR");
 				}
 			} catch (IOException e) {
