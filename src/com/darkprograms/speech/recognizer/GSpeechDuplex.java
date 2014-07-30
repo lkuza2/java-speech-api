@@ -202,6 +202,7 @@ public class GSpeechDuplex{
 					}
 
 				}
+				inStream.close();
 				System.out.println("Finished write on down stream...");
 			}
 		}.start();
