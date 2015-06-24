@@ -275,7 +275,7 @@ public class GSpeechDuplex{
 			httpConn.connect();
 			resCode = httpConn.getResponseCode();
 			if (resCode == HttpsURLConnection.HTTP_OK) {
-				return new Scanner(httpConn.getInputStream());
+				return new Scanner(httpConn.getInputStream(), "UTF-8");
 			}
 			else{
 				System.out.println("Error: " + resCode);
