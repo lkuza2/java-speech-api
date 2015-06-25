@@ -519,5 +519,5 @@ public class GSpeechDuplex{
 			return tmpData;
 		}
 	}
-
+}
 }
