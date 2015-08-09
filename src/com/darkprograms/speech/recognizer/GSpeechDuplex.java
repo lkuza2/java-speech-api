@@ -10,7 +10,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import javaFlacEncoder.FLACFileWriter;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.sound.sampled.AudioFormat;
@@ -21,6 +20,8 @@ import javax.sound.sampled.TargetDataLine;
 
 import com.darkprograms.speech.util.ChunkedOutputStream;
 import com.darkprograms.speech.util.StringUtil;
+
+import javaFlacEncoder.FLACFileWriter;
 
 /**
  * A class for using Google's Duplex Speech API. Allows for continuous recognition. Requires an API-Key.
@@ -61,7 +62,7 @@ public class GSpeechDuplex{
 	/**
 	 * User-defined language
 	 */
-	private String language = "auto";
+	private String language = "de-de";
 
 	/**
 	 * The maximum size the API will tolerate
