@@ -520,4 +520,3 @@ public class GSpeechDuplex{
 		}
 	}
 }
-}
