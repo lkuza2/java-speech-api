@@ -3,6 +3,7 @@ package com.darkprograms.speech.recognizer;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -10,6 +11,10 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.sound.sampled.AudioFormat;
@@ -31,6 +36,14 @@ import javaFlacEncoder.FLACFileWriter;
  * @author Skylion (Aaron Gokaslan), Robert Rowntree.
  */
 public class GSpeechDuplex{
+	public interface Catchable{
+		/**
+		 * Is called from a separate thread if something went wrong! It is maybe called just after a few 
+		 * seconds after stop capturing.
+		 * @param throwable The exception occurred. One probable exception is{@link GoogleHTTPException}
+		 */
+		public void onException(Throwable throwable);
+	}
 	
 	//TODO Cleanup Printlns 
 	
@@ -103,10 +116,11 @@ public class GSpeechDuplex{
 	 * @param flacFile The file you wish to upload.
 	 * NOTE: Segment the file if duration is greater than 15 seconds.
 	 * @param sampleRate The sample rate of the file.
+	 * @param exceptionCallback If something went wrong on the HTTP downstream thread.
 	 * @throws IOException If something has gone wrong with reading the file
 	 */
-	public void recognize(File flacFile, int sampleRate) throws IOException{
-		recognize(mapFileIn(flacFile), sampleRate);
+	public void recognize(File flacFile, int sampleRate, Catchable exceptionCallback) throws IOException{
+		recognize(mapFileIn(flacFile), sampleRate, exceptionCallback);
 	}
 
 	/**
@@ -114,15 +128,16 @@ public class GSpeechDuplex{
 	 * NOTE: The byte[] should contain no more than 15 seconds of audio.
 	 * Chunking is not fully implemented as of yet. Will not string data together for context yet.
 	 * @param data The byte[] you want to send.
+	 * @param exceptionCallback If something went wrong on the HTTP downstream thread.
 	 * @param sampleRate The sample rate of aforementioned byte array.
 	 */
-	public void recognize(byte[] data, int sampleRate){
+	public void recognize(byte[] data, int sampleRate, Catchable exceptionCallback){
 
 		if(data.length >= MAX_SIZE){//Temporary Chunking. Does not allow for Google to gather context.
 			System.out.println("Chunking the audio into smaller parts...");
 			byte[][] dataArray = chunkAudio(data);
 			for(byte[]array: dataArray){
-				recognize(array, sampleRate);
+				recognize(array, sampleRate, exceptionCallback);
 			}
 		}
 
@@ -138,7 +153,7 @@ public class GSpeechDuplex{
 				"&key=" + API_KEY ;
 
 		//Opens downChannel
-		this.downChannel(API_DOWN_URL);
+		this.downChannel(API_DOWN_URL, exceptionCallback);
 		//Opens upChannel
 		this.upChannel(API_UP_URL, chunkAudio(data), sampleRate);
 	}
@@ -148,10 +163,11 @@ public class GSpeechDuplex{
 	 * <p>Note: This feature is experimental.</p>
 	 * @param tl 
 	 * @param af
+	 * @param exceptionCallback If something went wrong on the HTTP downstream thread.
 	 * @throws IOException
 	 * @throws LineUnavailableException
 	 */
-	public void recognize(TargetDataLine tl, AudioFormat af) throws IOException, LineUnavailableException{
+	public void recognize(TargetDataLine tl, AudioFormat af, Catchable exceptionCallback) throws IOException, LineUnavailableException{
 		//Generates a unique ID for the response. 
 		final long PAIR = MIN + (long)(Math.random() * ((MAX - MIN) + 1L));
 
@@ -166,7 +182,7 @@ public class GSpeechDuplex{
 		//TODO Add implementation that sends feedback in real time. Protocol buffers will be necessary.
 		
 		//Opens downChannel
-		this.downChannel(API_DOWN_URL);
+		this.downChannel(API_DOWN_URL, exceptionCallback);
 		//Opens upChannel
 		this.upChannel(API_UP_URL, tl, af);
 	}
@@ -176,10 +192,14 @@ public class GSpeechDuplex{
 	 * the best way to handle this is through the use of listeners.
 	 * @param The URL you want to connect to.
 	 */
-	private void downChannel(String urlStr) {
+	private void downChannel(String urlStr, Catchable callback) {
 		final String url = urlStr;
-		new Thread ("Downstream Thread") {
-			public void run() {
+		
+		Callable<Void> task = new Callable<Void>()
+		{
+			@Override
+			public Void call() throws Exception
+			{
 				// handler for DOWN channel http response stream - httpsUrlConn
 				// response handler should manage the connection.... ??
 				// assign a TIMEOUT Value that exceeds by a safe factor
@@ -192,7 +212,7 @@ public class GSpeechDuplex{
 				// httpsUrlConn and allow it enough time to do its work.
 				Scanner inStream = openHttpsConnection(url);
 				if(inStream == null){
-					//ERROR HAS OCCURED
+					throw new GoogleHTTPException();
 				}
 				while(inStream.hasNextLine()){
 					String response = inStream.nextLine();
@@ -205,8 +225,18 @@ public class GSpeechDuplex{
 				}
 				inStream.close();
 				System.out.println("Finished write on down stream...");
+				return null;
 			}
-		}.start();
+		};
+		Future<Void> future = Executors.newFixedThreadPool(1).submit(task);
+		try {
+		   future.get();
+		} catch (ExecutionException ex) {
+		   callback.onException(ex.getCause());
+		} catch (InterruptedException e)
+		{
+			callback.onException(e);
+		}
 	}
 
 
