@@ -1,15 +1,16 @@
 package com.darkprograms.speech.recognizer;
 
-import javaFlacEncoder.FLACEncoder;
-import javaFlacEncoder.FLACFileOutputStream;
-import javaFlacEncoder.StreamConfiguration;
+import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import java.io.File;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+
+import javaFlacEncoder.FLACEncoder;
+import javaFlacEncoder.FLACFileOutputStream;
+import javaFlacEncoder.StreamConfiguration;
 
 /*************************************************************************************************************
  * Class that contains methods to encode Wave files to FLAC files
