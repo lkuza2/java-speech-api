@@ -89,8 +89,9 @@ public class Microphone implements Closeable{
      *
      * @param fileType File type to save the audio in<br>
      *                 Example, to save as WAVE use AudioFileFormat.Type.WAVE
+     * @throws MicrophoneException Is thrown if there was an error initializing the microphone
      */
-    public Microphone(AudioFileFormat.Type fileType) {
+    public Microphone(AudioFileFormat.Type fileType) throws MicrophoneException {
         setState(CaptureState.CLOSED);
         setFileType(fileType);
         initTargetDataLine();
@@ -99,16 +100,13 @@ public class Microphone implements Closeable{
     /**
      * Initializes the target data line.
      */
-    private void initTargetDataLine(){
+    private void initTargetDataLine() throws MicrophoneException{
         DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
         try {
 			setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
-		} catch (LineUnavailableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
+		} catch (IllegalArgumentException | LineUnavailableException e) {
+			throw new MicrophoneException(e);
 		}
-
     }
 
 
@@ -116,10 +114,10 @@ public class Microphone implements Closeable{
      * Captures audio from the microphone and saves it a file
      *
      * @param audioFile The File to save the audio to
-     * @throws LineUnavailableException 
+     * @throws MicrophoneException Is thrown if there was an error initializing the microphone
      * @throws Exception Throws an exception if something went wrong
      */
-    public void captureAudioToFile(File audioFile) throws LineUnavailableException {
+    public void captureAudioToFile(File audioFile) throws MicrophoneException {
         setState(CaptureState.STARTING_CAPTURE);
         setAudioFile(audioFile);
 
@@ -137,10 +135,10 @@ public class Microphone implements Closeable{
      * Captures audio from the microphone and saves it a file
      *
      * @param audioFile The fully path (String) to a file you want to save the audio in
-     * @throws LineUnavailableException 
+     * @throws MicrophoneException Is thrown if there was an error initializing the microphone
      * @throws Exception Throws an exception if something went wrong
      */
-    public void captureAudioToFile(String audioFile) throws LineUnavailableException {
+    public void captureAudioToFile(String audioFile) throws MicrophoneException {
         File file = new File(audioFile);
         captureAudioToFile(file);
     }
@@ -168,8 +166,9 @@ public class Microphone implements Closeable{
     /**
      * Opens the microphone, starting the targetDataLine.
      * If it's already open, it does nothing.
+     * @throws MicrophoneException Is thrown if there was an error - the microphone
      */
-    public void open(){
+    public void open() throws MicrophoneException{
         if(getTargetDataLine()==null){
         	initTargetDataLine();
         }
@@ -179,9 +178,7 @@ public class Microphone implements Closeable{
         		getTargetDataLine().open(getAudioFormat());
             	getTargetDataLine().start();
 			} catch (LineUnavailableException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return;
+				throw new MicrophoneException(e);
 			}
         }
 

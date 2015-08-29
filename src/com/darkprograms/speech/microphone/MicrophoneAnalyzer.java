@@ -16,8 +16,9 @@ public class MicrophoneAnalyzer extends Microphone {
 	/**
 	 * Constructor
 	 * @param fileType The file type you want to save in. FLAC recommended.
+	 * @throws MicrophoneException Is thrown if there was an error initializing the microphone
 	 */
-	public MicrophoneAnalyzer(AudioFileFormat.Type fileType){
+	public MicrophoneAnalyzer(AudioFileFormat.Type fileType) throws MicrophoneException{
 		super(fileType);
 	}
 	
