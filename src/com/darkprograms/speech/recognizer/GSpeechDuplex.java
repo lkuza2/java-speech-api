@@ -75,7 +75,7 @@ public class GSpeechDuplex{
 	/**
 	 * User-defined language
 	 */
-	private String language = "de-de";
+	private String language = "auto";
 
 	/**
 	 * The maximum size the API will tolerate
