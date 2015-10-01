@@ -10,10 +10,11 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import javaFlacEncoder.FLACFileWriter;
+import org.plwww.flacencoder.*;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
@@ -46,7 +47,7 @@ public class GSpeechDuplex{
 	/**
 	 * The base URL for the API
 	 */
-	private static final String GOOGLE_DUPLEX_SPEECH_BASE = "https://www.google.com/speech-api/full-duplex/v1/";
+	private static final String GOOGLE_DUPLEX_SPEECH_BASE = "https://www.google.com/speech-api/full-duplex/v2/";
 
 	/**
 	 * Stores listeners

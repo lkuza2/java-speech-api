@@ -1,8 +1,8 @@
 package com.darkprograms.speech.recognizer;
 
-import javaFlacEncoder.FLACEncoder;
-import javaFlacEncoder.FLACFileOutputStream;
-import javaFlacEncoder.StreamConfiguration;
+import org.plwww.flacencoder.FLACEncoder;
+import org.plwww.flacencoder.FLACFileOutputStream;
+import org.plwww.flacencoder.StreamConfiguration;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
