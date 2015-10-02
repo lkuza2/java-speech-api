@@ -472,7 +472,7 @@ public class GSpeechDuplex{
 
 	/**
 	 * Adds GSpeechResponse Listeners that fire when Google sends a response.
-	 * @param The Listeners you want to add
+	 * @param rl The Listeners you want to add
 	 */
 	public synchronized void addResponseListener(GSpeechResponseListener rl){
 		responseListeners.add(rl);
@@ -480,7 +480,7 @@ public class GSpeechDuplex{
 
 	/**
 	 * Removes GSpeechResponseListeners that fire when Google sends a response.
-	 * @param rl
+	 * @param rl The Listeners you want to remove
 	 */
 	public synchronized void removeResponseListener(GSpeechResponseListener rl){
 		responseListeners.remove(rl);

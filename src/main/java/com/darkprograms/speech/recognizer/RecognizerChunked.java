@@ -105,7 +105,7 @@ public class RecognizerChunked {
 	
 	/**
 	 * Analyzes the file for speech
-	 * @param infile The file you want to analyze for speech.
+	 * @param inFile The file you want to analyze for speech.
 	 * @param sampleRate The sample rate of the audioFile.
 	 * @throws IOException if something goes wrong reading the file.
 	 */

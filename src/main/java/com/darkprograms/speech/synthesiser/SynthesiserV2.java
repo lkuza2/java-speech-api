@@ -276,7 +276,7 @@ public class SynthesiserV2 {
 	 * Automatically determines the language of the original text
 	 * @param text represents the text you want to check the language of
 	 * @return the languageCode in ISO-639
-	 * @throws Exception if it cannot complete the request
+	 * @throws IOException if it cannot complete the request
 	 */
 	public String detectLanguage(String text) throws IOException{
 		return GoogleTranslate.detectLanguage(text);

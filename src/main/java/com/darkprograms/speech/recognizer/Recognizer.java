@@ -133,7 +133,8 @@ public class Recognizer {
     
     /**
      * Constructor
-     * @param Language
+     * @param language
+     * @param apikey
      */
      @Deprecated
     public Recognizer(String language, String apikey) {
@@ -144,6 +145,7 @@ public class Recognizer {
     /**
      * Constructor
      * @param language The Languages class for the language you want to designate
+     * @param apikey
      */
      public Recognizer(Languages language, String apikey){
      	this.language = language.languageCode;
@@ -153,6 +155,7 @@ public class Recognizer {
     /**
      * Constructor
      * @param profanityFilter
+     * @param apikey
      */
     public Recognizer(boolean profanityFilter, String apikey){
     	this.profanityFilter = profanityFilter;
@@ -163,6 +166,7 @@ public class Recognizer {
      * Constructor
      * @param language
      * @param profanityFilter
+     * @param apikey
      */
      @Deprecated
     public Recognizer(String language, boolean profanityFilter, String apikey){
@@ -175,6 +179,7 @@ public class Recognizer {
      * Constructor
      * @param language
      * @param profanityFilter
+     * @param apikey
      */
      public Recognizer(Languages language, boolean profanityFilter, String apikey){
      	this.language = language.languageCode;
@@ -279,9 +284,9 @@ public class Recognizer {
      *
      * @param flacFile FLAC file to recognize
      * @param maxResults the maximum number of results to return in the response
-     * @param samepleRate The sampleRate of the file. Default is 8000.
-     * @return Returns a GoogleResponse, with the response and confidence score
-     * @throws IOException Throws exception if something goes wrong
+     * @param sampleRate The sampleRate of the file. Default is 8000.
+     * @return GoogleResponse with the response and confidence score
+     * @throws IOException if something goes wrong
      */
     public GoogleResponse getRecognizedDataForFlac(File flacFile, int maxResults, int sampleRate) throws IOException{
         String [] response = rawRequest(flacFile, maxResults, sampleRate);
@@ -295,9 +300,9 @@ public class Recognizer {
      *
      * @param flacFile FLAC file to recognize
      * @param maxResults the maximum number of results to return in the response
-     * @param samepleRate The sampleRate of the file. Default is 8000.
-     * @return Returns a GoogleResponse, with the response and confidence score
-     * @throws IOException Throws exception if something goes wrong
+     * @param sampleRate The sampleRate of the file. Default is 8000.
+     * @return GoogleResponse, with the response and confidence score
+     * @throws IOException if something goes wrong
      */
     public GoogleResponse getRecognizedDataForFlac(String flacFile, int maxResults, int sampleRate) throws IOException{
     	return getRecognizedDataForFlac(new File(flacFile), maxResults, sampleRate);
