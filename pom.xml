@@ -14,11 +14,62 @@
   <name>java-speech-api</name>
   <url>https://github.com/lkuza2/java-speech-api/</url>
 
+  <description>
+    The J.A.R.V.I.S. Speech API is designed to be simple and efficient, using the speech engines created by Google to provide functionality for parts of the API. Essentially, it is an API written in Java, including a recognizer, synthesizer, and a microphone capture utility. The project uses Google services for the synthesizer and recognizer. While this requires an Internet connection, it provides a complete, modern, and fully functional speech API in Java.
+  </description>
+
   <scm>
-    <connection>scm:git:git://github.com/amplexus/java-speech-api.git</connection>
-    <developerConnection>scm:git:git@github.com:amplexus/java-speech-api.git</developerConnection>
-    <url>http://github.com/amplexus/java-speech-api</url>
+    <connection>scm:git:git://github.com/lkuza2/java-speech-api.git</connection>
+    <developerConnection>scm:git:git@github.com:lkuza2/java-speech-api.git</developerConnection>
+    <url>http://github.com/lkuza2/java-speech-api</url>
   </scm>
+
+  <licenses>
+    <license>
+      <name>GNU GPL(v3)</name>
+      <url>https://github.com/lkuza2/java-speech-api/blob/master/LICENSE</url>
+    </license>
+  </licenses>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/lkuza2/java-speech-api/issues/</url>
+  </issueManagement>
+
+  <developers>
+    <developer>
+      <id>https://github.com/Skylion007</id>
+      <name>Skylion007</name>
+    </developer>
+    <developer>
+      <id>https://github.com/lkuza2</id>
+      <name>lkuza2</name>
+    </developer>
+    <developer>
+      <id>https://github.com/AdamuKaapan</id>
+      <name>AdamuKaapan</name>
+    </developer>
+    <developer>
+      <id>https://github.com/duncanj</id>
+      <name>duncanj</name>
+    </developer>
+    <developer>
+      <id>https://github.com/Iegorchenkov</id>
+      <name>Iegorchenkov</name>
+    </developer>
+    <developer>
+      <id>https://github.com/xingrz</id>
+      <name>xingrz</name>
+    </developer>
+    <developer>
+      <id>https://github.com/ClusterM</id>
+      <name>ClusterM</name>
+    </developer>
+    <developer>
+      <id>https://github.com/AranHase</id>
+      <name>AranHase</name>
+    </developer>
+  </developers>
 
   <dependencies>
     <dependency>
@@ -34,7 +85,6 @@
   </dependencies>
 
   <build>
-    <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -69,7 +119,6 @@
           </executions>
         </plugin>
       </plugins>
-    </pluginManagement>
   </build>
 
   <distributionManagement>
