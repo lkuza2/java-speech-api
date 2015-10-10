@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import org.plwww.flacencoder.*;
+import net.sourceforge.javaflacencoder.*;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.sound.sampled.AudioFormat;
