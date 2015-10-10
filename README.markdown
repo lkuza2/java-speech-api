@@ -32,7 +32,7 @@ Info on how to publish this library as a Maven artifact can be found here:
 * http://datumedge.blogspot.co.uk/2012/05/publishing-from-github-to-maven-central.html
 
 A sample application using this library can be found here:
-* https://github.com/amplexus/java-speech-api-demo
+* See API-Example repository branch. 
 
 ##Changelog
 See CHANGELOG.markdown for Version History/Changelog
