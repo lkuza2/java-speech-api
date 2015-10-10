@@ -34,7 +34,6 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 	 * Useful for UI Strings
 	 * @param languageCode The ISO639-1 
 	 * @return The language in the user's default language
-	 * @see {@link #detectLanguage}
 	 */
 	public static String getDisplayLanguage(String languageCode){
 		return (new Locale(languageCode)).getDisplayLanguage();

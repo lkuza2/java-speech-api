@@ -10,10 +10,11 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import javaFlacEncoder.FLACFileWriter;
+import net.sourceforge.javaflacencoder.*;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
@@ -46,7 +47,7 @@ public class GSpeechDuplex{
 	/**
 	 * The base URL for the API
 	 */
-	private static final String GOOGLE_DUPLEX_SPEECH_BASE = "https://www.google.com/speech-api/full-duplex/v1/";
+	private static final String GOOGLE_DUPLEX_SPEECH_BASE = "https://www.google.com/speech-api/full-duplex/v2/";
 
 	/**
 	 * Stores listeners
@@ -471,7 +472,7 @@ public class GSpeechDuplex{
 
 	/**
 	 * Adds GSpeechResponse Listeners that fire when Google sends a response.
-	 * @param The Listeners you want to add
+	 * @param rl The Listeners you want to add
 	 */
 	public synchronized void addResponseListener(GSpeechResponseListener rl){
 		responseListeners.add(rl);
@@ -479,7 +480,7 @@ public class GSpeechDuplex{
 
 	/**
 	 * Removes GSpeechResponseListeners that fire when Google sends a response.
-	 * @param rl
+	 * @param rl The Listeners you want to remove
 	 */
 	public synchronized void removeResponseListener(GSpeechResponseListener rl){
 		responseListeners.remove(rl);

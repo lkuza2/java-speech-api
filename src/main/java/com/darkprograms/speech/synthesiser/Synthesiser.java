@@ -20,47 +20,51 @@ import java.util.concurrent.Future;
 import com.darkprograms.speech.translator.GoogleTranslate;
 
 
-/**
- * This class uses the V2 version of Google's Text to Speech API. While this class requires an API key,
- * the endpoint allows for additional specification of parameters including speed and pitch. 
- * See the constructor for instructions regarding the API_Key.
- * @author Skylion (Aaron Gokaslan)
- */
-public class SynthesiserV2 {
 
-	private static final String GOOGLE_SYNTHESISER_URL = "https://www.google.com/speech-api/v2/synthesize?enc=mpeg" +
-			"&client=chromium";
-	
+/*******************************************************************************
+ * Synthesiser class that connects to Google's unoffical API to retrieve data
+ *
+ * @author Luke Kuza, Aaron Gokaslan (Skylion)
+ *******************************************************************************/
+public class Synthesiser {
+
 	/**
-	 * API_KEY used for requests
+	 * URL to query for Google synthesiser
 	 */
-	private final String API_KEY;
+	private final static String GOOGLE_SYNTHESISER_URL = "http://translate.google.com/translate_tts?tl=";
 
 	/**
 	 * language of the Text you want to translate
 	 */
-	private String languageCode;
-	
+	private String languageCode; 
+
 	/**
-	 * The pitch of the generated audio
+	 * LANG_XX_XXXX Variables are language codes. 
 	 */
-	private double pitch = 1.0;
-	
-	/**
-	 * The speed of the generated audio
-	 */
-	private double speed = 1.0;
-	
+	public static final String LANG_AU_ENGLISH = "en-AU";
+	public static final String LANG_US_ENGLISH = "en-US";
+	public static final String LANG_UK_ENGLISH = "en-GB";
+	public static final String LANG_ES_SPANISH = "es";
+	public static final String LANG_FR_FRENCH = "fr";
+	public static final String LANG_DE_GERMAN = "de";
+	public static final String LANG_PT_PORTUGUESE = "pt-pt";
+	public static final String LANG_PT_BRAZILIAN = "pt-br";
+	//Please add on more regional languages as you find them. Also try to include the accent code if you can can.
+
 	/**
 	 * Constructor
-	 * @param API_KEY The API-Key for Google's Speech API. An API key can be obtained by requesting
-	 * one by following the process shown at this 
-	 * <a href="http://www.chromium.org/developers/how-tos/api-keys">url</a>.
 	 */
-	public SynthesiserV2(String API_KEY){
-		this.API_KEY = API_KEY;
+	public Synthesiser() {
+		languageCode = "auto";
 	}
-	
+
+	/**
+	 * Constructor that takes language code parameter. Specify to "auto" for language autoDetection 
+	 */
+	public Synthesiser(String languageCode){
+		this.languageCode = languageCode;
+	}
+
 	/**
 	 * Returns the current language code for the Synthesiser.
 	 * Example: English(Generic) = en, English (US) = en-US, English (UK) = en-GB. and Spanish = es;
@@ -79,40 +83,6 @@ public class SynthesiserV2 {
 		this.languageCode = languageCode;
 	}
 
-	/**
-	 * @return the pitch
-	 */
-	public double getPitch() {
-		return pitch;
-	}
-
-	/**
-	 * Sets the pitch of the audio.
-	 * Valid values range from 0 to 2 inclusive.
-	 * Values above 1 correspond to higher pitch, values below 1 correspond to lower pitch.
-	 * @param pitch the pitch to set
-	 */
-	public void setPitch(double pitch) {
-		this.pitch = pitch;
-	}
-
-	/**
-	 * @return the speed
-	 */
-	public double getSpeed() {
-		return speed;
-	}
-
-	/**
-	 * Sets the speed of audio.
-	 * Valid values range from 0 to 2 inclusive.
-	 * Values higher than one correspond to faster and vice versa. 
-	 * @param speed the speed to set
-	 */
-	public void setSpeed(double speed) {
-		this.speed = speed;
-	}
-	
 	/**
 	 * Gets an input stream to MP3 data for the returned information from a request
 	 *
@@ -146,29 +116,14 @@ public class SynthesiserV2 {
 			return out;
 		}
 
-
 		String encoded = URLEncoder.encode(synthText, "UTF-8"); //Encode
 
-		StringBuilder sb = new StringBuilder(GOOGLE_SYNTHESISER_URL);
-		sb.append("&key=" + API_KEY);
-		sb.append("&text=" + encoded);
-		sb.append("&lang=" + languageCode);
-
-		if(speed>=0 && speed<=2.0){
-			sb.append("&speed=" + speed/2.0);
-		}
-		
-		if(pitch>=0 && pitch<=2.0){
-			sb.append("&pitch=" + pitch/2.0);
-		}
-		
-		URL url = new URL(sb.toString()); //create url
-
+		URL url = new URL(GOOGLE_SYNTHESISER_URL + languageCode + "&q=" + encoded + "&ie=UTF-8&total=1&idx=0&client=t");
 		// Open New URL connection channel.
 		URLConnection urlConn = url.openConnection(); //Open connection
-
-		urlConn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:2.0) Gecko/20100101 Firefox/4.0"); //Adding header for user agent is required
 		
+		urlConn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:2.0) Gecko/20100101 Firefox/4.0"); //Adding header for user agent is required
+
 		return urlConn.getInputStream();
 	}
 
@@ -276,7 +231,7 @@ public class SynthesiserV2 {
 	 * Automatically determines the language of the original text
 	 * @param text represents the text you want to check the language of
 	 * @return the languageCode in ISO-639
-	 * @throws Exception if it cannot complete the request
+	 * @throws IOException if it cannot complete the request
 	 */
 	public String detectLanguage(String text) throws IOException{
 		return GoogleTranslate.detectLanguage(text);
@@ -299,5 +254,6 @@ public class SynthesiserV2 {
 			return getMP3Data(synthText);
 		}
 	}
-	
+
 }
+

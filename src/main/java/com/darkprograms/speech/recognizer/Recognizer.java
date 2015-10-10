@@ -1,10 +1,12 @@
 package com.darkprograms.speech.recognizer;
 
+import java.util.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 
+import org.json.*;
 import com.darkprograms.speech.util.StringUtil;
 
 /***************************************************************
@@ -116,62 +118,73 @@ public class Recognizer {
     /**
      * URL to POST audio data and retrieve results
      */
-    private static final String GOOGLE_RECOGNIZER_URL = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium";
+    // "http://www.google.com/speech-api/v2/recognize?lang=en-us&key=ADD_YOUR_KEY_HERE&output=json" 
+    private static final String GOOGLE_RECOGNIZER_URL = "http://www.google.com/speech-api/v2/recognize?client=chromium&output=json";
 
     private boolean profanityFilter = true;
     private String language = null;
+    private String apikey = null;
 
     /**
      * Constructor
      */
-    public Recognizer() {
-    	this.setLanguage(Languages.AUTO_DETECT);
+    private Recognizer() {
     }
     
     /**
      * Constructor
-     * @param Language
+     * @param language
+     * @param apikey
      */
      @Deprecated
-    public Recognizer(String language) {
+    public Recognizer(String language, String apikey) {
         this.language = language; 
+        this.apikey = apikey;
     }
     
     /**
      * Constructor
      * @param language The Languages class for the language you want to designate
+     * @param apikey
      */
-     public Recognizer(Languages language){
+     public Recognizer(Languages language, String apikey){
      	this.language = language.languageCode;
+        this.apikey = apikey;
      }
     
     /**
      * Constructor
      * @param profanityFilter
+     * @param apikey
      */
-    public Recognizer(boolean profanityFilter){
+    public Recognizer(boolean profanityFilter, String apikey){
     	this.profanityFilter = profanityFilter;
+        this.apikey = apikey;
     }
     
     /**
      * Constructor
      * @param language
      * @param profanityFilter
+     * @param apikey
      */
      @Deprecated
-    public Recognizer(String language, boolean profanityFilter){
+    public Recognizer(String language, boolean profanityFilter, String apikey){
     	this.language = language;
     	this.profanityFilter = profanityFilter;
+        this.apikey = apikey;
     }
     
    /**
      * Constructor
      * @param language
      * @param profanityFilter
+     * @param apikey
      */
-     public Recognizer(Languages language, boolean profanityFilter){
+     public Recognizer(Languages language, boolean profanityFilter, String apikey){
      	this.language = language.languageCode;
      	this.profanityFilter = profanityFilter;
+        this.apikey = apikey;
      }
     
     /**
@@ -209,6 +222,14 @@ public class Recognizer {
      */
     public String getLanguage(){
     	return language;
+    }
+
+    public String getApiKey() {
+        return apikey;
+    }
+
+    public void setApiKey(String apikey) {
+        this.apikey = apikey;
     }
 
     /**
@@ -263,12 +284,12 @@ public class Recognizer {
      *
      * @param flacFile FLAC file to recognize
      * @param maxResults the maximum number of results to return in the response
-     * @param samepleRate The sampleRate of the file. Default is 8000.
-     * @return Returns a GoogleResponse, with the response and confidence score
-     * @throws IOException Throws exception if something goes wrong
+     * @param sampleRate The sampleRate of the file. Default is 8000.
+     * @return GoogleResponse with the response and confidence score
+     * @throws IOException if something goes wrong
      */
     public GoogleResponse getRecognizedDataForFlac(File flacFile, int maxResults, int sampleRate) throws IOException{
-        String response = rawRequest(flacFile, maxResults, sampleRate);
+        String [] response = rawRequest(flacFile, maxResults, sampleRate);
         GoogleResponse googleResponse = new GoogleResponse();
         parseResponse(response, googleResponse);
         return googleResponse;
@@ -279,9 +300,9 @@ public class Recognizer {
      *
      * @param flacFile FLAC file to recognize
      * @param maxResults the maximum number of results to return in the response
-     * @param samepleRate The sampleRate of the file. Default is 8000.
-     * @return Returns a GoogleResponse, with the response and confidence score
-     * @throws IOException Throws exception if something goes wrong
+     * @param sampleRate The sampleRate of the file. Default is 8000.
+     * @return GoogleResponse, with the response and confidence score
+     * @throws IOException if something goes wrong
      */
     public GoogleResponse getRecognizedDataForFlac(String flacFile, int maxResults, int sampleRate) throws IOException{
     	return getRecognizedDataForFlac(new File(flacFile), maxResults, sampleRate);
@@ -353,42 +374,26 @@ public class Recognizer {
      * @param rawResponse The raw, unparsed response from Google
      * @return Returns the parsed response in the form of a Google Response.
      */
-    private void parseResponse(String rawResponse, GoogleResponse googleResponse) {
-        if (rawResponse == null || !rawResponse.contains("utterance"))
-            return;
+    private void parseResponse(String[] rawResponse, GoogleResponse googleResponse) {
 
-        String array = StringUtil.substringBetween(rawResponse, "[", "]");
-        String[] parts = array.split("}");
-        
-        boolean first = true;
-        for( String s : parts ) {
-            if( first ) {
-                first = false;
-                String utterancePart = s.split(",")[0];
-                String confidencePart = s.split(",")[1];
-
-                String utterance = utterancePart.split(":")[1];
-                String confidence = confidencePart.split(":")[1];
-
-                utterance = StringUtil.stripQuotes(utterance);
-                confidence = StringUtil.stripQuotes(confidence);
-
-                if( utterance.equals("null") ) {
-                    utterance = null;
+        for(String s : rawResponse) {
+            JSONObject jsonResponse = new JSONObject(s);
+            JSONArray jsonResultArray = jsonResponse.getJSONArray("result");
+            for(int i = 0; i < jsonResultArray.length(); i++) {
+                JSONObject jsonAlternativeObject = jsonResultArray.getJSONObject(i);
+                JSONArray jsonAlternativeArray = jsonAlternativeObject.getJSONArray("alternative");
+                double prevConfidence = 0;
+                for(int j = 0; j < jsonAlternativeArray.length(); j++) {
+                    JSONObject jsonTranscriptObject = jsonAlternativeArray.getJSONObject(j);
+                    String transcript = jsonTranscriptObject.optString("transcript", "");
+                    double confidence = jsonTranscriptObject.optDouble("confidence", 0.0);
+                    if(confidence > prevConfidence) {
+                        googleResponse.setResponse(transcript);
+                        googleResponse.setConfidence(String.valueOf(confidence));
+                        prevConfidence = confidence;
+                    } else
+                        googleResponse.getOtherPossibleResponses().add(transcript);
                 }
-                if( confidence.equals("null") ) {
-                    confidence = null;
-                }
-
-                googleResponse.setResponse(utterance);
-                googleResponse.setConfidence(confidence);
-            } else {
-                String utterance = s.split(":")[1];
-                utterance = StringUtil.stripQuotes(utterance);
-                if( utterance.equals("null") ) {
-                    utterance = null;
-                }
-                googleResponse.getOtherPossibleResponses().add(utterance);
             }
         }
     }
@@ -401,7 +406,7 @@ public class Recognizer {
      * @return Returns the raw, unparsed response from Google
      * @throws IOException Throws exception if something went wrong
      */
-    private String rawRequest(File inputFile, int maxResults, int sampleRate) throws IOException{
+    private String[] rawRequest(File inputFile, int maxResults, int sampleRate) throws IOException{
         URL url;
         URLConnection urlConn;
         OutputStream outputStream;
@@ -415,6 +420,11 @@ public class Recognizer {
         else{
         	sb.append("&lang=auto");
         }
+        if(apikey != null) {
+                sb.append("&key=");
+                sb.append(apikey);
+        }
+
         if( !profanityFilter ) {
             sb.append("&pfilter=0");
         }
@@ -423,7 +433,7 @@ public class Recognizer {
 
         // URL of Remote Script.
         url = new URL(sb.toString());
-
+        // System.out.println("Recognizer.rawRequest(): url=" + url);
 
         // Open New URL connection channel.
         urlConn = url.openConnection();
@@ -440,7 +450,6 @@ public class Recognizer {
         // Send POST output.
         outputStream = urlConn.getOutputStream();
 
-
         FileInputStream fileInputStream = new FileInputStream(inputFile);
 
         byte[] buffer = new byte[256];
@@ -455,12 +464,16 @@ public class Recognizer {
         // Get response data.
         br = new BufferedReader(new InputStreamReader(urlConn.getInputStream(), Charset.forName("UTF-8")));
 
+        List<String> completeResponse = new ArrayList<String>();
         String response = br.readLine();
+        while(response != null) {
+            completeResponse.add(response);
+            response = br.readLine();
+        }
 
         br.close();
 
-        return response;
-
+        // System.out.println("Recognizer.rawRequest() -> completeResponse = " + completeResponse);
+        return completeResponse.toArray(new String[completeResponse.size()]);
     }
-
 }

@@ -1,0 +1,170 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.darkprograms.speech</groupId>
+  <artifactId>java-speech-api</artifactId>
+  <version>1.13.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <name>java-speech-api</name>
+  <url>https://github.com/lkuza2/java-speech-api/</url>
+
+  <description>
+    The J.A.R.V.I.S. Speech API is designed to be simple and efficient, using the speech engines created by Google to provide functionality for parts of the API. Essentially, it is an API written in Java, including a recognizer, synthesizer, and a microphone capture utility. The project uses Google services for the synthesizer and recognizer. While this requires an Internet connection, it provides a complete, modern, and fully functional speech API in Java.
+  </description>
+
+  <scm>
+    <connection>scm:git:git://github.com/lkuza2/java-speech-api.git</connection>
+    <developerConnection>scm:git:git@github.com:lkuza2/java-speech-api.git</developerConnection>
+    <url>http://github.com/lkuza2/java-speech-api</url>
+  </scm>
+
+  <licenses>
+    <license>
+      <name>GNU GPL(v3)</name>
+      <url>https://github.com/lkuza2/java-speech-api/blob/master/LICENSE</url>
+    </license>
+  </licenses>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/lkuza2/java-speech-api/issues/</url>
+  </issueManagement>
+
+  <developers>
+    <developer>
+      <id>https://github.com/Skylion007</id>
+      <name>Skylion007</name>
+    </developer>
+    <developer>
+      <id>https://github.com/lkuza2</id>
+      <name>lkuza2</name>
+    </developer>
+    <developer>
+      <id>https://github.com/AdamuKaapan</id>
+      <name>AdamuKaapan</name>
+    </developer>
+    <developer>
+      <id>https://github.com/duncanj</id>
+      <name>duncanj</name>
+    </developer>
+    <developer>
+      <id>https://github.com/Iegorchenkov</id>
+      <name>Iegorchenkov</name>
+    </developer>
+    <developer>
+      <id>https://github.com/xingrz</id>
+      <name>xingrz</name>
+    </developer>
+    <developer>
+      <id>https://github.com/ClusterM</id>
+      <name>ClusterM</name>
+    </developer>
+    <developer>
+      <id>https://github.com/AranHase</id>
+      <name>AranHase</name>
+    </developer>
+  </developers>
+
+  <dependencies>
+    <dependency>
+      <groupId>net.sourceforge.javaflacencoder</groupId>
+      <artifactId>java-flac-encoder</artifactId>
+      <version>0.3.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20150729</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.2.2</version>
+          <configuration>
+          <arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+  </build>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>sonatype-nexus-snapshots</id>
+      <name>Sonatype Nexus snapshot repository</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>sonatype-nexus-staging</id>
+      <name>Sonatype Nexus release repository</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
+  <profiles>
+    <profile>
+      <id>release-sign-artifacts</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+       <plugins>
+         <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-gpg-plugin</artifactId>
+           <version>1.4</version>
+           <configuration>
+             <passphrase>${gpg.passphrase}</passphrase>
+           </configuration>
+           <executions>
+             <execution>
+               <id>sign-artifacts</id>
+               <phase>verify</phase>
+               <goals>
+                 <goal>sign</goal>
+               </goals>
+             </execution>
+           </executions>
+         </plugin>
+       </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

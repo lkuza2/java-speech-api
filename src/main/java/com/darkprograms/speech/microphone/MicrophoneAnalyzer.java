@@ -7,7 +7,7 @@ import com.darkprograms.speech.util.*;
  * Microphone Analyzer class, detects pitch and volume while extending the microphone class.
  * Implemented as a precursor to a Voice Activity Detection (VAD) algorithm.
  * Currently can be used for audio data analysis.
- * Dependencies: FFT.java & Complex.java. Both found in the utility package.
+ * Dependencies: FFT.java and Complex.java. Both found in the utility package.
  * @author Aaron Gokaslan
  ********************************************************************************************/
 

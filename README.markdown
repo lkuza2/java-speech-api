@@ -23,6 +23,17 @@ The API currently provides the following functionality,
   * Wave to FLAC API (Wrapped around the used API in the project, javaFlacEncoder, see CREDITS)
   * A translator using Google Translate (courtesy of Skylion's Google Toolkit)
 
+##Notes
+
+To get access to the Google API, you need an API key. To get this, you need to follow the instructions here: 
+* https://stackoverflow.com/questions/26485531/google-speech-api-v2
+
+Info on how to publish this library as a Maven artifact can be found here:
+* http://datumedge.blogspot.co.uk/2012/05/publishing-from-github-to-maven-central.html
+
+A sample application using this library can be found here:
+* https://github.com/amplexus/java-speech-api-demo
+
 ##Changelog
 See CHANGELOG.markdown for Version History/Changelog
 
