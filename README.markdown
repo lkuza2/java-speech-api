@@ -5,11 +5,7 @@ This is a project for the Java Speech API. The program interprets vocal inputs i
 The program supports dozens of languages and even has the ability to auto-detect languages! 
 
 ## Description
-The J.A.R.V.I.S. Speech API is designed to be simple and efficient, using the speech engines created by Google  
-to provide functionality for parts of the API. Essentially, it is an API written in Java,  
-including a recognizer, synthesizer, and a microphone capture utility.  The project uses  
-Google services for the synthesizer and recognizer.  While this requires an Internet  
-connection, it provides a complete, modern, and fully functional speech API in Java.
+The J.A.R.V.I.S. Speech API is designed to be simple and efficient, using the speech engines created by Google to provide functionality for parts of the API. Essentially, it is an API written in Java, including a recognizer, synthesizer, and a microphone capture utility. The project uses Google services for the synthesizer and recognizer.  While this requires an Internet connection, it provides a complete, modern, and fully functional speech API in Java.
 
 ##Features
 The API currently provides the following functionality,
