@@ -31,7 +31,7 @@ public class Synthesiser {
 	/**
 	 * URL to query for Google synthesiser
 	 */
-	private final static String GOOGLE_SYNTHESISER_URL = "http://translate.google.com/translate_tts?tl=";
+	private final static String GOOGLE_SYNTHESISER_URL = "http://translate.google.com/translate_tts";
 
 	/**
 	 * language of the Text you want to translate
@@ -54,6 +54,7 @@ public class Synthesiser {
 	/**
 	 * Constructor
 	 */
+	@Deprecated
 	public Synthesiser() {
 		languageCode = "auto";
 	}
@@ -98,14 +99,17 @@ public class Synthesiser {
 			try{
 				languageCode = detectLanguage(synthText);//Detects language
 				if(languageCode == null){
+					System.out.println("Unable to detect language");
 					languageCode = "en-us";//Reverts to Default Language if it can't detect it.
 				}
 			}
 			catch(Exception ex){
 				ex.printStackTrace();
+				System.out.println("An exception was thrown");
 				languageCode = "en-us";//Reverts to Default Language if it can't detect it.
 			}
 		}
+		System.out.println("Detected Language code is " + languageCode);
 
 		if(synthText.length()>100){
 			List<String> fragments = parseString(synthText);//parses String if too long
@@ -118,11 +122,24 @@ public class Synthesiser {
 
 		String encoded = URLEncoder.encode(synthText, "UTF-8"); //Encode
 
-		URL url = new URL(GOOGLE_SYNTHESISER_URL + languageCode + "&q=" + encoded + "&ie=UTF-8&total=1&idx=0&client=t");
+		StringBuilder sb = new StringBuilder();
+		sb.append(GOOGLE_SYNTHESISER_URL); //The base URL prefixed by the query parameter.
+		sb.append("?tl="); 
+		sb.append(languageCode); //The query parameter to specify the language code.
+		sb.append("&q=");
+		sb.append(encoded); //We encode the String using URL Encoder
+		sb.append("&ie=UTF-8&total=1&idx=0"); //Some unknown parameters needed to make the URL work
+		sb.append("&textlen=");
+		sb.append(synthText.length()); //We need some String length now.
+		sb.append("&client=tw-ob"); //Once again, a weird parameter.
+		//Client=t no longer works as it requires a token, but client=tw-ob seems to work just fine.
+		
+		URL url = new URL(sb.toString());
 		// Open New URL connection channel.
 		URLConnection urlConn = url.openConnection(); //Open connection
 		
-		urlConn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:2.0) Gecko/20100101 Firefox/4.0"); //Adding header for user agent is required
+		//Adding header for user agent is required
+		urlConn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:2.0) Gecko/20100101 Firefox/4.0");
 
 		return urlConn.getInputStream();
 	}
@@ -254,6 +271,6 @@ public class Synthesiser {
 			return getMP3Data(synthText);
 		}
 	}
-
+	
 }
 
