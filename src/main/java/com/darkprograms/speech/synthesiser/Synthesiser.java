@@ -99,18 +99,16 @@ public class Synthesiser {
 			try{
 				languageCode = detectLanguage(synthText);//Detects language
 				if(languageCode == null){
-					System.out.println("Unable to detect language");
 					languageCode = "en-us";//Reverts to Default Language if it can't detect it.
+					//Throw an error message here eventually
 				}
 			}
 			catch(Exception ex){
 				ex.printStackTrace();
-				System.out.println("An exception was thrown");
 				languageCode = "en-us";//Reverts to Default Language if it can't detect it.
 			}
 		}
-		System.out.println("Detected Language code is " + languageCode);
-
+		
 		if(synthText.length()>100){
 			List<String> fragments = parseString(synthText);//parses String if too long
 			String tmp = getLanguage();
@@ -272,5 +270,14 @@ public class Synthesiser {
 		}
 	}
 	
+	public static void main(String[] args){
+		Synthesiser synth = new Synthesiser("en-US");
+		try {
+			synth.getMP3Data("Hello, this is a test");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
 
