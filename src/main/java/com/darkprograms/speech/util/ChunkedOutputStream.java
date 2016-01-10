@@ -91,8 +91,8 @@ public class ChunkedOutputStream extends BufferedOutputStream
 	}
 
 
-	private Vector footerNames = new Vector();
-	private Vector footerValues = new Vector();
+	private Vector<String> footerNames = new Vector<String>();
+	private Vector<String> footerValues = new Vector<String>();
 
 	/// Set a footer.  Footers are much like HTTP headers, except that
 	// they come at the end of the data instead of at the beginning.
@@ -169,6 +169,7 @@ public class ChunkedOutputStream extends BufferedOutputStream
 	/// The only routine that actually writes to the output stream.
 	// This is where chunking semantics are implemented.
 	// @exception IOException if an I/O error occurred
+	@SuppressWarnings("deprecation")
 	private void writeBuf( byte b[], int off, int len ) throws IOException
 	{
 		// Write the chunk length as a hex number.
