@@ -14,7 +14,6 @@ import net.sourceforge.javaflacencoder.*;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
@@ -22,6 +21,9 @@ import javax.sound.sampled.TargetDataLine;
 
 import com.darkprograms.speech.util.ChunkedOutputStream;
 import com.darkprograms.speech.util.StringUtil;
+
+//TODO Add a better logging system to GSpeechDuplex
+//TODO Find out why the V2 version of duplex no longer works.
 
 /**
  * A class for using Google's Duplex Speech API. Allows for continuous recognition. Requires an API-Key.
@@ -31,8 +33,6 @@ import com.darkprograms.speech.util.StringUtil;
  * @author Skylion (Aaron Gokaslan), Robert Rowntree.
  */
 public class GSpeechDuplex{
-	
-	//TODO Cleanup Printlns 
 	
 	/**
 	 * Minimum value for ID
@@ -47,7 +47,7 @@ public class GSpeechDuplex{
 	/**
 	 * The base URL for the API
 	 */
-	private static final String GOOGLE_DUPLEX_SPEECH_BASE = "https://www.google.com/speech-api/full-duplex/v2/";
+	private static final String GOOGLE_DUPLEX_SPEECH_BASE = "https://www.google.com/speech-api/full-duplex/v1/";
 
 	/**
 	 * Stores listeners
@@ -161,9 +161,7 @@ public class GSpeechDuplex{
 		//Generates the Upstream URL
 		final String API_UP_URL = GOOGLE_DUPLEX_SPEECH_BASE + 
 				"up?lang=" + language + "&lm=dictation&client=chromium&pair=" + PAIR + 
-				"&key=" + API_KEY + "&continuous"; //Tells Google to constantly monitor the stream;
-
-		//TODO Add implementation that sends feedback in real time. Protocol buffers will be necessary.
+				"&key=" + API_KEY + "&continuous=true&interim=true"; //Tells Google to constantly monitor the stream;
 		
 		//Opens downChannel
 		this.downChannel(API_DOWN_URL);
@@ -371,7 +369,7 @@ public class GSpeechDuplex{
 			httpConn.setRequestProperty("Content-Type", "audio/x-flac; rate=" + sampleRate);
 			// also worked with ("Content-Type", "audio/amr; rate=8000");
 			httpConn.connect();
-			try {
+			
 				// this opens a connection, then sends POST & headers.
 				out = httpConn.getOutputStream();
 				//Note : if the audio is more than 15 seconds
@@ -385,7 +383,6 @@ public class GSpeechDuplex{
 					try {
 						Thread.sleep(1000);//Delays the Audio so Google thinks its a mic.
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -397,9 +394,7 @@ public class GSpeechDuplex{
 				if (resCode / 100 != 2)  {
 					System.out.println("ERROR");
 				}
-			} catch (IOException e) {
-
-			}
+			
 			if (resCode == HttpsURLConnection.HTTP_OK) {
 				return new Scanner(httpConn.getInputStream());
 			}
@@ -432,42 +427,21 @@ public class GSpeechDuplex{
 	private void parseResponse(String rawResponse, GoogleResponse gr){
 		if(rawResponse == null || !rawResponse.contains("\"result\"")
 				|| rawResponse.equals("{\"result\":[]}")){ return; }
+		gr.getOtherPossibleResponses().clear(); // Emptys the list
 		if(rawResponse.contains("\"confidence\":")){
 			String confidence = StringUtil.substringBetween(rawResponse, "\"confidence\":", "}");
 			gr.setConfidence(confidence);
 		}
 		else{
-			gr.setConfidence(String.valueOf(1d));
+			gr.setConfidence(String.valueOf(1));
 		}
-		String array = StringUtil.trimString(rawResponse, "[", "]");
-		if(array.contains("[")){
-			array = StringUtil.trimString(array, "[", "]");
+		String response = StringUtil.substringBetween(rawResponse, "[{\"transcript\":\"", "\"}],");
+		gr.setResponse(response);
+		String[] currentHypos = rawResponse.split("\\[\\{\"transcript\":\"");
+		for(int i = 2; i<currentHypos.length; i++){
+			String cleaned = currentHypos[i].substring(0, currentHypos[i].indexOf("\""));
+			gr.getOtherPossibleResponses().add(cleaned);
 		}
-		if(array.contains("\"confidence\":")){//Removes confidence phrase if it exists.
-			array = array.substring(0, array.lastIndexOf(','));
-		}
-		String[] parts = array.split(",");
-		gr.setResponse(parseTranscript(parts[0]));
-		for(int i = 1; i<parts.length; i++){
-			gr.getOtherPossibleResponses().add(parseTranscript(parts[i]));
-		}
-	}
-
-	/**
-	 * Parses each individual "transcript" phrase
-	 * @param The string fragment to parse
-	 * @return The parsed String
-	 */
-	private String parseTranscript(String s){
-		String tmp = s.substring(s.indexOf(":")+1);
-		if(s.endsWith("}")){
-			tmp = tmp.substring(0, tmp.length()-1);
-		}
-		tmp = StringUtil.stripQuotes(tmp);
-		if(tmp.charAt(0)==' '){//Removes space at beginning if it exists
-			tmp = tmp.substring(1);
-		}
-		return tmp;
 	}
 
 	/**
@@ -508,7 +482,6 @@ public class GSpeechDuplex{
 			byte[][] data2D = new byte[numOfChunks][];
 			for(int i = 0, j = 0; i<data.length && j<data2D.length; i+=frame, j++){
 				int length = (data.length - i < frame)? data.length - i: frame;
-				System.out.println("LENGTH: " + length);
 				data2D[j] = new byte[length];
 				System.arraycopy(data, i, data2D[j], 0, length);
 			}
