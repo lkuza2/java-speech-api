@@ -27,7 +27,7 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 	/**
 	 * URL to query for Translation
 	 */
-	private final static String GOOGLE_TRANSLATE_URL = "http://translate.google.com/translate_a/t";
+	private final static String GOOGLE_TRANSLATE_URL = "http://translate.google.com/translate_a/single";
 
 	/**
 	 * Private to prevent instantiation
@@ -51,7 +51,8 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 	 * @param text The text that you wish to generate
 	 * @return The generated URL as a string.
 	 */
-	private static String generateURL(String sourceLanguage, String targetLanguage, String text) throws UnsupportedEncodingException{
+	private static String generateURL(String sourceLanguage, String targetLanguage, String text) 
+			throws UnsupportedEncodingException{
 		String encoded = URLEncoder.encode(text, "UTF-8"); //Encode
 		StringBuilder sb = new StringBuilder();
 		sb.append(GOOGLE_TRANSLATE_URL);
@@ -70,6 +71,9 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 		sb.append("&ssel=0");
 		sb.append("&tsel=0");
 		sb.append("&sc=1");
+		sb.append("&dt=t");//This parameters requests the translated text back.
+		//Other dt parameters request additional information such as pronunciation, and so on.
+		//TODO Modify API so that the user may request this additional information.
 		sb.append("&ie=UTF-8"); //Input encoding
 		sb.append("&oe=UTF-8"); //Output encoding
 		sb.append("&tk="); //Token authentication parameter
@@ -127,7 +131,7 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 	 */
 	public static String translate(String sourceLanguage, String targetLanguage, String text) throws IOException{
 		String urlText = generateURL(sourceLanguage, targetLanguage, text);
-		URL url = new URL(urlText);//GOOGLE_TRANSLATE_URL + "&sl=" + sourceLanguage + "&tl=" + targetLanguage +  "&text=" + encoded); 
+		URL url = new URL(urlText);
 		String rawData = urlToText(url);//Gets text from Google
 		if(rawData==null){
 			return null;
@@ -249,7 +253,7 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 			int d = b.charAt(c + 2);
 			d = d >= 65 ? d - 87 : d - 48;
 			d = b.charAt(c + 1) == '+' ? shr32(a, d) : (a << d);
-			a = b.charAt(c) == '+' ? (a + d & 0xFFFFFFFF) : a ^ d;
+			a = b.charAt(c) == '+' ? (a + (d & 0xFFFFFFFF)) : a ^ d;
 		}
 		return a;
 	}
