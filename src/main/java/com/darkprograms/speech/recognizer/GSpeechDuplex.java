@@ -19,7 +19,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 
-import com.darkprograms.speech.util.ChunkedOutputStream;
 import com.darkprograms.speech.util.StringUtil;
 
 //TODO Add a better logging system to GSpeechDuplex
@@ -109,6 +108,8 @@ public class GSpeechDuplex{
 		recognize(mapFileIn(flacFile), sampleRate);
 	}
 
+
+
 	/**
 	 * Send a byte[] to the URL with a specified sampleRate.
 	 * NOTE: The byte[] should contain no more than 15 seconds of audio.
@@ -119,7 +120,6 @@ public class GSpeechDuplex{
 	public void recognize(byte[] data, int sampleRate){
 
 		if(data.length >= MAX_SIZE){//Temporary Chunking. Does not allow for Google to gather context.
-			System.out.println("Chunking the audio into smaller parts...");
 			byte[][] dataArray = chunkAudio(data);
 			for(byte[]array: dataArray){
 				recognize(array, sampleRate);
@@ -162,9 +162,10 @@ public class GSpeechDuplex{
 		final String API_UP_URL = GOOGLE_DUPLEX_SPEECH_BASE + 
 				"up?lang=" + language + "&lm=dictation&client=chromium&pair=" + PAIR + 
 				"&key=" + API_KEY + "&continuous=true&interim=true"; //Tells Google to constantly monitor the stream;
-		
+
 		//Opens downChannel
 		this.downChannel(API_DOWN_URL);
+
 		//Opens upChannel
 		this.upChannel(API_UP_URL, tl, af);
 	}
@@ -191,15 +192,16 @@ public class GSpeechDuplex{
 				Scanner inStream = openHttpsConnection(url);
 				if(inStream == null){
 					//ERROR HAS OCCURED
+					System.out.println("Error has occured");
+					return;
 				}
-				while(inStream.hasNextLine()){
-					String response = inStream.nextLine();
+				String response;
+				while(inStream.hasNext() && (response = inStream.nextLine()) != null){
 					if(response.length()>17){//Prevents blank responses from Firing
 						GoogleResponse gr = new GoogleResponse();
 						parseResponse(response, gr);
 						fireResponseEvent(gr);
 					}
-
 				}
 				inStream.close();
 				System.out.println("Finished write on down stream...");
@@ -233,7 +235,7 @@ public class GSpeechDuplex{
 	 * @param af The AudioFormat to stream with.
 	 * @throws LineUnavailableException If cannot open or stream the TargetDataLine.
 	 */
-	private void upChannel(String urlStr, TargetDataLine tl, AudioFormat af) throws LineUnavailableException{
+	private void upChannel(String urlStr, TargetDataLine tl, AudioFormat af) throws IOException, LineUnavailableException{
 		final String murl = urlStr;
 		final TargetDataLine mtl = tl;
 		final AudioFormat maf = af;
@@ -243,9 +245,8 @@ public class GSpeechDuplex{
 		}
 		new Thread ("Upstream Thread") {
 			public void run() {
-				openHttpsPostConnection(murl, mtl, maf);
+				openHttpsPostConnection(murl, mtl, (int)maf.getSampleRate());
 			}
-
 		}.start();
 
 	}
@@ -258,8 +259,6 @@ public class GSpeechDuplex{
 	private Scanner openHttpsConnection(String urlStr) {
 		int resCode = -1;
 		try {
-
-
 			URL url = new URL(urlStr);
 			URLConnection urlConn = url.openConnection();
 			if (!(urlConn instanceof HttpsURLConnection)) {
@@ -270,7 +269,6 @@ public class GSpeechDuplex{
 			// TIMEOUT is required
 			httpConn.setInstanceFollowRedirects(true);
 			httpConn.setRequestMethod("GET");
-
 			httpConn.connect();
 			resCode = httpConn.getResponseCode();
 			if (resCode == HttpsURLConnection.HTTP_OK) {
@@ -293,8 +291,7 @@ public class GSpeechDuplex{
 	 * @param mtl The TargetDataLine you want to post data from. <b>Note should be open</b>
 	 * @param maf The AudioFormat of the data you want to post
 	 */
-	private void openHttpsPostConnection(final String murl,
-			final TargetDataLine mtl, final AudioFormat maf) {
+	private void openHttpsPostConnection(String murl, TargetDataLine mtl, int sampleRate) {
 		URL url;
 		try {
 			url = new URL(murl);
@@ -302,6 +299,7 @@ public class GSpeechDuplex{
 			if (!(urlConn instanceof HttpsURLConnection)) {
 				throw new IOException ("URL is not an Https URL");
 			}
+
 			HttpsURLConnection httpConn = (HttpsURLConnection)urlConn;
 			httpConn.setAllowUserInteraction(false);
 			httpConn.setInstanceFollowRedirects(true);
@@ -309,33 +307,37 @@ public class GSpeechDuplex{
 			httpConn.setDoOutput(true);
 			httpConn.setChunkedStreamingMode(0);
 			httpConn.setRequestProperty("Transfer-Encoding", "chunked");
-			httpConn.setRequestProperty("Content-Type", "audio/x-flac; rate=" + (int)maf.getSampleRate());
+			httpConn.setRequestProperty("Content-Type", "audio/x-flac; rate=" + sampleRate);
 			// also worked with ("Content-Type", "audio/amr; rate=8000");
 			httpConn.connect();
-
+			
 			// this opens a connection, then sends POST & headers.
-			OutputStream out = httpConn.getOutputStream();
+			final OutputStream out = httpConn.getOutputStream();
 			//Note : if the audio is more than 15 seconds
 			// dont write it to UrlConnInputStream all in one block as this sample does.
 			// Rather, segment the byteArray and on intermittently, sleeping thread
 			// supply bytes to the urlConn Stream at a rate that approaches
 			// the bitrate ( =30K per sec. in this instance ).
 			System.out.println("Starting to write data to output...");
-			AudioInputStream ais = new AudioInputStream(mtl);
-			ChunkedOutputStream os = new ChunkedOutputStream(out);
-			AudioSystem.write(ais, FLACFileWriter.FLAC, os);
-			out.write(FINAL_CHUNK);
-			System.out.println("IO WRITE DONE");
-			out.close();
+			final AudioInputStream ais = new AudioInputStream(mtl);;
+			AudioSystem.write(ais, FLACFileWriter.FLAC, out);
+			//Output Stream is automatically closed
 			// do you need the trailer?
 			// NOW you can look at the status.
-			int resCode = httpConn.getResponseCode();
+
+			//Diagonostic Code.
+			/*int resCode = httpConn.getResponseCode();
 			if (resCode / 100 != 2) {
 				System.out.println("ERROR");
 			}
-		}catch(Exception ex){
+			Scanner scanner = new Scanner(httpConn.getInputStream());
+			while(scanner.hasNextLine()){
+				System.out.println("UPSTREAM READS:" + scanner.nextLine());
+			}
+			scanner.close();*/
+			System.out.println("Upstream Closed...");
+		}catch(IOException ex){
 			ex.printStackTrace();
-
 		}
 	}
 
@@ -369,34 +371,32 @@ public class GSpeechDuplex{
 			httpConn.setRequestProperty("Content-Type", "audio/x-flac; rate=" + sampleRate);
 			// also worked with ("Content-Type", "audio/amr; rate=8000");
 			httpConn.connect();
-			
-				// this opens a connection, then sends POST & headers.
-				out = httpConn.getOutputStream();
-				//Note : if the audio is more than 15 seconds
-				// dont write it to UrlConnInputStream all in one block as this sample does.
-				// Rather, segment the byteArray and on intermittently, sleeping thread
-				// supply bytes to the urlConn Stream at a rate that approaches
-				// the bitrate ( =30K per sec. in this instance ).
-				System.out.println("Starting to write");
-				for(byte[] dataArray: mextrad){
-					out.write(dataArray); // one big block supplied instantly to the underlying chunker wont work for duration > 15 s.
-					try {
-						Thread.sleep(1000);//Delays the Audio so Google thinks its a mic.
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+			// this opens a connection, then sends POST & headers.
+			out = httpConn.getOutputStream();
+			//Note : if the audio is more than 15 seconds
+			// dont write it to UrlConnInputStream all in one block as this sample does.
+			// Rather, segment the byteArray and on intermittently, sleeping thread
+			// supply bytes to the urlConn Stream at a rate that approaches
+			// the bitrate ( =30K per sec. in this instance ).
+			System.out.println("Starting to write");
+			for(byte[] dataArray: mextrad){
+				out.write(dataArray); // one big block supplied instantly to the underlying chunker wont work for duration > 15 s.
+				try {
+					Thread.sleep(1000);//Delays the Audio so Google thinks its a mic.
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-				out.write(FINAL_CHUNK);
-				System.out.println("IO WRITE DONE");
-				// do you need the trailer?
-				// NOW you can look at the status.
-				resCode = httpConn.getResponseCode();
-				if (resCode / 100 != 2)  {
-					System.out.println("ERROR");
-				}
-			
+			}
+			out.write(FINAL_CHUNK);
+			System.out.println("IO WRITE DONE");
+			// do you need the trailer?
+			// NOW you can look at the status.
+			resCode = httpConn.getResponseCode();
+			if (resCode / 100 != 2) {
+				System.out.println("ERROR");
+			}
 			if (resCode == HttpsURLConnection.HTTP_OK) {
-				return new Scanner(httpConn.getInputStream());
+				return new Scanner(httpConn.getInputStream(), "UTF-8");
 			}
 			else{
 				System.out.println("HELP: " + resCode);

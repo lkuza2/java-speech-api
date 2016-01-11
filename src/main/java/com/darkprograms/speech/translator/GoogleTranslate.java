@@ -7,8 +7,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -217,16 +215,9 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 	 * This function generates the b parameter for translation acting as the seed for the hashing algorithm.
 	 */
 	private static int generateB() {
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-
-		Date start;
-		Date now;
-		try {
-			start = sdf.parse("01/01/1970");
-			now = new Date();
-		} catch (ParseException e) {
-			return 402890;
-		}
+		Date start = new Date(0L); //Unix Epoch
+		Date now = new Date();
+	
 		long diff = now.getTime() - start.getTime();
 		long hours = diff / (60 * 60 * 1000) % 24;
 		long days = diff / (24 * 60 * 60 * 1000);

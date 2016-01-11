@@ -7,7 +7,6 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 
 import org.json.*;
-import com.darkprograms.speech.util.StringUtil;
 
 /***************************************************************
  * Class that submits FLAC audio and retrieves recognized text
@@ -124,12 +123,6 @@ public class Recognizer {
     private boolean profanityFilter = true;
     private String language = null;
     private String apikey = null;
-
-    /**
-     * Constructor
-     */
-    private Recognizer() {
-    }
     
     /**
      * Constructor

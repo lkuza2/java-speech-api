@@ -54,7 +54,6 @@ public class Synthesiser {
 	/**
 	 * Constructor
 	 */
-	@Deprecated
 	public Synthesiser() {
 		languageCode = "auto";
 	}
@@ -96,16 +95,14 @@ public class Synthesiser {
 		String languageCode = this.languageCode;//Ensures retention of language settings if set to auto
 
 		if(languageCode == null || languageCode.equals("") || languageCode.equalsIgnoreCase("auto")){
-			try{
-				languageCode = detectLanguage(synthText);//Detects language
-				if(languageCode == null){
-					languageCode = "en-us";//Reverts to Default Language if it can't detect it.
-					//Throw an error message here eventually
-				}
-			}
-			catch(Exception ex){
-				ex.printStackTrace();
+			languageCode = detectLanguage(synthText);//Detects language
+			/* NOTE: Detect language relies on an entirely seperate endpoint.
+			 * If the GoogleTranslate API stops working, do not use the auto parameter
+			 * and switch to something else or a best guess.
+			 */
+			if(languageCode == null){
 				languageCode = "en-us";//Reverts to Default Language if it can't detect it.
+				//Throw an error message here eventually
 			}
 		}
 		
@@ -137,7 +134,8 @@ public class Synthesiser {
 		URLConnection urlConn = url.openConnection(); //Open connection
 		
 		//Adding header for user agent is required
-		urlConn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:2.0) Gecko/20100101 Firefox/4.0");
+		urlConn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:2.0) "
+				+ "Gecko/20100101 Firefox/4.0");
 
 		return urlConn.getInputStream();
 	}
@@ -201,7 +199,8 @@ public class Synthesiser {
 				fragments.add(input.substring(0,100));//In case you sent gibberish to Google.
 				return parseString(input.substring(100), fragments);
 			}else{
-				fragments.add(input.substring(0,lastWord));//Otherwise, adds the last word to the list for recursion.
+				fragments.add(input.substring(0,lastWord));
+				//Otherwise, adds the last word to the list for recursion.
 				return parseString(input.substring(lastWord), fragments);
 			}
 		}
@@ -267,16 +266,6 @@ public class Synthesiser {
 		
 		public InputStream call() throws IOException{
 			return getMP3Data(synthText);
-		}
-	}
-	
-	public static void main(String[] args){
-		Synthesiser synth = new Synthesiser("en-US");
-		try {
-			synth.getMP3Data("Hello, this is a test");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }
