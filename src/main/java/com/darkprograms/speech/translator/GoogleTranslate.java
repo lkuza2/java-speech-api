@@ -75,7 +75,7 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 		sb.append("&ie=UTF-8"); //Input encoding
 		sb.append("&oe=UTF-8"); //Output encoding
 		sb.append("&tk="); //Token authentication parameter
-		sb.append(generateToken(encoded));
+		sb.append(generateToken(text));
 		return sb.toString();
 	}
 
