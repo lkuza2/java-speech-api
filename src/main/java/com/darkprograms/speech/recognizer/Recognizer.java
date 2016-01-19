@@ -13,10 +13,8 @@ import org.json.*;
  *
  * @author Luke Kuza, Duncan Jauncey, Aaron Gokaslan
  **************************************************************/
-@Deprecated
 public class Recognizer {
 
-	@Deprecated
     public enum Languages{
 		AUTO_DETECT("auto"),//tells Google to auto-detect the language
 		ARABIC_JORDAN("ar-JO"),
@@ -129,7 +127,6 @@ public class Recognizer {
      * @param language
      * @param apikey
      */
-     @Deprecated
     public Recognizer(String language, String apikey) {
         this.language = language; 
         this.apikey = apikey;
@@ -161,7 +158,6 @@ public class Recognizer {
      * @param profanityFilter
      * @param apikey
      */
-     @Deprecated
     public Recognizer(String language, boolean profanityFilter, String apikey){
     	this.language = language;
     	this.profanityFilter = profanityFilter;
@@ -194,7 +190,6 @@ public class Recognizer {
      * This value is null by default.
      * @param language The language code.
      */
-     @Deprecated
     public void setLanguage(String language) {
     	this.language = language;
     }
@@ -439,6 +434,8 @@ public class Recognizer {
 
         // Specify the header content type.
         urlConn.setRequestProperty("Content-Type", "audio/x-flac; rate=" + sampleRate);
+        urlConn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) "
+        		+ "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.52 Safari/537.36");
 
         // Send POST output.
         outputStream = urlConn.getOutputStream();
