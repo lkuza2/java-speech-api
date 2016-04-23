@@ -24,6 +24,8 @@ public class GoogleResponse {
      */
     private List<String> otherPossibleResponses = new ArrayList<String>(20);
 
+
+    private boolean finalResponse = true;
     /**
      * Constructor
      */
@@ -86,4 +88,11 @@ public class GoogleResponse {
     	return tmp;
     }
 
+    public boolean isFinalResponse() {
+        return finalResponse;
+    }
+
+    public void setFinalResponse(boolean finalResponse) {
+        this.finalResponse = finalResponse;
+    }
 }
