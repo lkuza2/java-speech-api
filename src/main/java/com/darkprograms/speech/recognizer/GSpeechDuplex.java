@@ -151,7 +151,7 @@ public class GSpeechDuplex{
 	 * @throws IOException
 	 * @throws LineUnavailableException
 	 */
-	public void recognize(TargetDataLine tl, AudioFormat af) throws IOException, LineUnavailableException{
+	public void recognize(TargetDataLine tl, AudioFormat af) throws IOException, LineUnavailableException, InterruptedException {
 		//Generates a unique ID for the response. 
 		final long PAIR = MIN + (long)(Math.random() * ((MAX - MIN) + 1L));
 
@@ -164,10 +164,21 @@ public class GSpeechDuplex{
 				"&key=" + API_KEY + "&continuous=true&interim=true"; //Tells Google to constantly monitor the stream;
 
 		//Opens downChannel
-		this.downChannel(API_DOWN_URL);
+		Thread downChannel = this.downChannel(API_DOWN_URL);
 
 		//Opens upChannel
-		this.upChannel(API_UP_URL, tl, af);
+		Thread upChannel = this.upChannel(API_UP_URL, tl, af);
+		try {
+			downChannel.join();
+			upChannel.interrupt();
+			upChannel.join();
+		} catch (InterruptedException e) {
+			downChannel.interrupt();
+			downChannel.join();
+			upChannel.interrupt();
+			upChannel.join();
+		}
+
 	}
 
 	/**
@@ -175,9 +186,9 @@ public class GSpeechDuplex{
 	 * the best way to handle this is through the use of listeners.
 	 * @param The URL you want to connect to.
 	 */
-	private void downChannel(String urlStr) {
+	private Thread downChannel(String urlStr) {
 		final String url = urlStr;
-		new Thread ("Downstream Thread") {
+		Thread downChannelThread = new Thread ("Downstream Thread") {
 			public void run() {
 				// handler for DOWN channel http response stream - httpsUrlConn
 				// response handler should manage the connection.... ??
@@ -206,7 +217,9 @@ public class GSpeechDuplex{
 				inStream.close();
 				System.out.println("Finished write on down stream...");
 			}
-		}.start();
+		};
+		downChannelThread.start();
+		return downChannelThread;
 	}
 
 
@@ -235,7 +248,7 @@ public class GSpeechDuplex{
 	 * @param af The AudioFormat to stream with.
 	 * @throws LineUnavailableException If cannot open or stream the TargetDataLine.
 	 */
-	private void upChannel(String urlStr, TargetDataLine tl, AudioFormat af) throws IOException, LineUnavailableException{
+	private Thread upChannel(String urlStr, TargetDataLine tl, AudioFormat af) throws IOException, LineUnavailableException{
 		final String murl = urlStr;
 		final TargetDataLine mtl = tl;
 		final AudioFormat maf = af;
@@ -243,11 +256,13 @@ public class GSpeechDuplex{
 			mtl.open(maf);
 			mtl.start();
 		}
-		new Thread ("Upstream Thread") {
+		Thread upChannelThread = new Thread ("Upstream Thread") {
 			public void run() {
 				openHttpsPostConnection(murl, mtl, (int)maf.getSampleRate());
 			}
-		}.start();
+		};
+		upChannelThread.start();
+		return upChannelThread;
 
 	}
 
@@ -436,7 +451,11 @@ public class GSpeechDuplex{
 			gr.setConfidence(String.valueOf(1));
 		}
 		String response = StringUtil.substringBetween(rawResponse, "[{\"transcript\":\"", "\"}],");
+		if (response == null) {
+			response = StringUtil.substringBetween(rawResponse, "[{\"transcript\":\"", "\",\"");
+		}
 		gr.setResponse(response);
+		gr.setFinalResponse(rawResponse.contains("\"final\":true"));
 		String[] currentHypos = rawResponse.split("\\[\\{\"transcript\":\"");
 		for(int i = 2; i<currentHypos.length; i++){
 			String cleaned = currentHypos[i].substring(0, currentHypos[i].indexOf("\""));
