@@ -304,28 +304,12 @@ public class GSpeechDuplex{
 	 * Opens a HTTPSPostConnection that posts data from a TargetDataLine input
 	 * @param murl The URL you want to post to.
 	 * @param mtl The TargetDataLine you want to post data from. <b>Note should be open</b>
-	 * @param maf The AudioFormat of the data you want to post
 	 */
 	private void openHttpsPostConnection(String murl, TargetDataLine mtl, int sampleRate) {
 		URL url;
 		try {
 			url = new URL(murl);
-			URLConnection urlConn = url.openConnection();
-			if (!(urlConn instanceof HttpsURLConnection)) {
-				throw new IOException ("URL is not an Https URL");
-			}
-
-			HttpsURLConnection httpConn = (HttpsURLConnection)urlConn;
-			httpConn.setAllowUserInteraction(false);
-			httpConn.setInstanceFollowRedirects(true);
-			httpConn.setRequestMethod("POST");
-			httpConn.setDoOutput(true);
-			httpConn.setChunkedStreamingMode(0);
-			httpConn.setRequestProperty("Transfer-Encoding", "chunked");
-			httpConn.setRequestProperty("Content-Type", "audio/x-flac; rate=" + sampleRate);
-			// also worked with ("Content-Type", "audio/amr; rate=8000");
-			httpConn.connect();
-			
+			HttpsURLConnection httpConn = getHttpsURLConnection(sampleRate, url);
 			// this opens a connection, then sends POST & headers.
 			final OutputStream out = httpConn.getOutputStream();
 			//Note : if the audio is more than 15 seconds
@@ -372,20 +356,7 @@ public class GSpeechDuplex{
 		// int http_status;
 		try {
 			URL url = new URL(urlStr);
-			URLConnection urlConn = url.openConnection();
-			if (!(urlConn instanceof HttpsURLConnection)) {
-				throw new IOException ("URL is not an Https URL");
-			}
-			HttpsURLConnection httpConn = (HttpsURLConnection)urlConn;
-			httpConn.setAllowUserInteraction(false);
-			httpConn.setInstanceFollowRedirects(true);
-			httpConn.setRequestMethod("POST");
-			httpConn.setDoOutput(true);
-			httpConn.setChunkedStreamingMode(0);
-			httpConn.setRequestProperty("Transfer-Encoding", "chunked");
-			httpConn.setRequestProperty("Content-Type", "audio/x-flac; rate=" + sampleRate);
-			// also worked with ("Content-Type", "audio/amr; rate=8000");
-			httpConn.connect();
+			HttpsURLConnection httpConn = getHttpsURLConnection(sampleRate, url);
 			// this opens a connection, then sends POST & headers.
 			out = httpConn.getOutputStream();
 			//Note : if the audio is more than 15 seconds
@@ -425,8 +396,32 @@ public class GSpeechDuplex{
 	}
 
 	/**
+	 * @param sampleRate
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */
+	private HttpsURLConnection getHttpsURLConnection(int sampleRate, URL url) throws IOException {
+		URLConnection urlConn = url.openConnection();
+		if (!(urlConn instanceof HttpsURLConnection)) {
+            throw new IOException ("URL is not an Https URL");
+        }
+		HttpsURLConnection httpConn = (HttpsURLConnection)urlConn;
+		httpConn.setAllowUserInteraction(false);
+		httpConn.setInstanceFollowRedirects(true);
+		httpConn.setRequestMethod("POST");
+		httpConn.setDoOutput(true);
+		httpConn.setChunkedStreamingMode(0);
+		httpConn.setRequestProperty("Transfer-Encoding", "chunked");
+		httpConn.setRequestProperty("Content-Type", "audio/x-flac; rate=" + sampleRate);
+		// also worked with ("Content-Type", "audio/amr; rate=8000");
+		httpConn.connect();
+		return httpConn;
+	}
+
+	/**
 	 * Converts the file into a byte[]. Also Android compatible. :)
-	 * @param The File you want to get the byte[] from.
+	 * @param infile The File you want to get the byte[] from.
 	 * @return The byte[]
 	 * @throws IOException if something goes wrong in reading the file. 
 	 */
