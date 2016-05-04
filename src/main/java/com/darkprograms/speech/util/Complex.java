@@ -114,7 +114,10 @@ public class Complex {
     }
     
     public boolean equals(Complex other){
-    	return (re==other.re) && (im==other.im);
+        if(other != null) {
+            return (re == other.re) && (im == other.im);
+        }
+        return false;
     }
     
 }

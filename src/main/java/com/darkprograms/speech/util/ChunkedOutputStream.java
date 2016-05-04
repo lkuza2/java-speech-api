@@ -62,12 +62,19 @@ import java.util.*;
 public class ChunkedOutputStream extends BufferedOutputStream
 {
 
+	private static final byte[] crlf = { 13, 10 };
+	private byte[] lenBytes = new byte[20]; // big enough for any number in hex
+	private List<String> footerNames = new ArrayList<String>();
+	private List<String> footerValues = new ArrayList<String>();
+
+
 	/// Make a ChunkedOutputStream with a default buffer size.
 	// @param out the underlying output stream
 	public ChunkedOutputStream( OutputStream out )
 	{
 		super( out );
 	}
+
 
 	/// Make a ChunkedOutputStream with a specified buffer size.
 	// @param out the underlying output stream
@@ -76,7 +83,6 @@ public class ChunkedOutputStream extends BufferedOutputStream
 	{
 		super( out, size );
 	}
-
 
 	/// Flush the stream.  This will write any buffered output
 	// bytes as a chunk.
@@ -91,15 +97,12 @@ public class ChunkedOutputStream extends BufferedOutputStream
 	}
 
 
-	private Vector<String> footerNames = new Vector<String>();
-	private Vector<String> footerValues = new Vector<String>();
-
 	/// Set a footer.  Footers are much like HTTP headers, except that
 	// they come at the end of the data instead of at the beginning.
 	public void setFooter( String name, String value )
 	{
-		footerNames.addElement( name );
-		footerValues.addElement( value );
+		footerNames.add( name );
+		footerValues.add( value );
 	}
 
 
@@ -116,8 +119,8 @@ public class ChunkedOutputStream extends BufferedOutputStream
 			// Send footers.
 			for ( int i = 0; i < footerNames.size(); ++i )
 			{
-				String name = (String) footerNames.elementAt( i );
-				String value = (String) footerValues.elementAt( i );
+				String name = footerNames.get( i );
+				String value = footerValues.get( i );
 				pout.println( name + ": " + value );
 			}
 		}
@@ -161,10 +164,6 @@ public class ChunkedOutputStream extends BufferedOutputStream
 		flush();
 		writeBuf( b, off, len );
 	}
-
-
-	private static final byte[] crlf = { 13, 10 };
-	private byte[] lenBytes = new byte[20]; // big enough for any number in hex
 
 	/// The only routine that actually writes to the output stream.
 	// This is where chunking semantics are implemented.
