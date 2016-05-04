@@ -28,6 +28,8 @@ package com.darkprograms.speech.util;
 
 public class FFT {
 
+    private FFT() {}
+
     // compute the FFT of x[], assuming its length is a power of 2
     public static Complex[] fft(Complex[] x) {
         int N = x.length;

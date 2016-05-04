@@ -188,7 +188,11 @@ public class RecognizerChunked {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				finally {httpConn.disconnect();}
+				finally {
+					if(httpConn != null) {
+						httpConn.disconnect();
+					}
+				}
 			}
 		}.start();
 	}

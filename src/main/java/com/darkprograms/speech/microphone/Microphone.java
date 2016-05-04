@@ -11,17 +11,18 @@ import java.io.File;
  * @author Luke Kuza, Aaron Gokaslan
  ***************************************************************************/
 public class Microphone implements Closeable{
-	
+
     /**
      * TargetDataLine variable to receive data from microphone
      */
     private TargetDataLine targetDataLine;
 
+
     /**
      * Enum for current Microphone state
      */
     public enum CaptureState {
-        PROCESSING_AUDIO, STARTING_CAPTURE, CLOSED
+        PROCESSING_AUDIO, STARTING_CAPTURE, CLOSED;
     }
 
     /**
@@ -38,6 +39,18 @@ public class Microphone implements Closeable{
      * Variable that holds the saved audio file
      */
     private File audioFile;
+
+    /**
+     * Constructor
+     *
+     * @param fileType File type to save the audio in<br>
+     *                 Example, to save as WAVE use AudioFileFormat.Type.WAVE
+     */
+    public Microphone(AudioFileFormat.Type fileType) {
+        setState(CaptureState.CLOSED);
+        setFileType(fileType);
+        initTargetDataLine();
+    }
 
     /**
      * Gets the current state of Microphone
@@ -79,21 +92,9 @@ public class Microphone implements Closeable{
         return targetDataLine;
     }
 
+    
     public void setTargetDataLine(TargetDataLine targetDataLine) {
         this.targetDataLine = targetDataLine;
-    }
-    
-    
-    /**
-     * Constructor
-     *
-     * @param fileType File type to save the audio in<br>
-     *                 Example, to save as WAVE use AudioFileFormat.Type.WAVE
-     */
-    public Microphone(AudioFileFormat.Type fileType) {
-        setState(CaptureState.CLOSED);
-        setFileType(fileType);
-        initTargetDataLine();
     }
 
     /**
