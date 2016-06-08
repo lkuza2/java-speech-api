@@ -214,7 +214,7 @@ public final class GoogleTranslate { //Class marked as final since all methods a
 	/** 
 	 * This function generates the int array for translation acting as the seed for the hashing algorithm.
 	 */
-	private int[] TKK() {
+	private static int[] TKK() {
 		int[] tkk = { 0x6337E, 0x217A58DC + 0x5AF91132};
 		return tkk;
 	}
