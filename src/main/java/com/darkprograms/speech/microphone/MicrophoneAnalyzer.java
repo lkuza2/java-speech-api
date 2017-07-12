@@ -157,6 +157,76 @@ public class MicrophoneAnalyzer extends Microphone {
 		Complex[] fftTransformed = FFT.fft(complex);
 		return this.calculateFundamentalFrequency(fftTransformed, 4);
 	}
+
+/*	*//**
+	 * borrowed from http://www.programcreek.com/java-api-examples/index.php?source_dir=Audio-Descriptors-master/src/audio/descriptors/AudioDescriptor.java
+	 *
+	 * Spectral flatness provides a way to quantify how tone-like a sound is, as opposed to
+	 * being noise-like. The meaning of tonal in this context is in the sense of the amount of peaks
+	 * or resonant structure in a power spectrum, as opposed to flat spectrum of a white noise.
+	 *
+	 *  @param bytes
+	 *  @return Spectral Flatness coefficient
+	 *//*
+	public int calculateSpectralFlatness(byte[] bytes) {
+		// compute FFT
+		FFT f = new FFT(x.bufferSize(), x.sampleRate());
+		f.window(FFT.HAMMING);
+		f.forward(x.right);
+
+		float num = 1;
+		float den = 0;
+		float Si = 0;
+		float asf = 0;  // result
+
+		final int n = -8;
+		final int B = 24;  // number of bands
+		final float loF = (float) (Math.pow(2, n/4.0) * 1000);  // lowest frequency [Hz]
+		final float hiF = (float) (Math.pow(2, B/4.0) * loF);  // highest frequency [Hz]
+		final int loK = f.freqToIndex(loF);
+		final int hiK = f.freqToIndex(hiF);
+		final float reduceFactor = hiK - loK + 1;
+
+		for(int k=loK; k<hiK; k++){
+			Si = f.getBand(k);
+			num *= Math.pow(Si, 1.0/reduceFactor);  // n-th root
+			den += Si;
+		}
+
+		den /= reduceFactor;
+		asf = num / den;
+		return asf;
+
+
+
+		// https://github.com/filipeuva/SoundBites/blob/master/src/uk/co/biogen/SoundBites/analysis/AnalysisInterface.java
+ps = powerSpectrum()
+		double geometricMean = 1.0, arithmeticMean = 0.0;
+		for (int i = 0; i < ps.length; i++) {
+			geometricMean *= ps[i];
+			arithmeticMean += ps[i];
+		}
+		geometricMean = Math.pow(geometricMean, 1 / WINDOW_SIZE_SAMPLES);
+		arithmeticMean /= WINDOW_SIZE_SAMPLES;
+
+		return geometricMean / arithmeticMean;
+	}*/
+
+	/**
+	 * Adapted from https://github.com/marytts/marytts/blob/master/marytts-signalproc/src/main/java/marytts/util/math/FFT.java
+	 * @param data
+	 * @return
+	 *//*
+	private double[] computePowerSpectrum(final double[] data) {
+		int N = data.length;
+		if (!MathUtils.isPowerOfTwo(N)) {
+			N = MathUtils.closestPowerOfTwoAbove(N);
+		}
+		double[] real = new double[N];
+		System.arraycopy(signal, 0, real, 0, data.length);
+		realTransform(real, false);
+		return computePowerSpectrum_FD(real);
+	}*/
 	
 	/**
 	 * Applies a Hanning Window to the data set.
@@ -292,5 +362,4 @@ public class MicrophoneAnalyzer extends Microphone {
 	    }
 	    return micBufferData;
 	}
-	
 }

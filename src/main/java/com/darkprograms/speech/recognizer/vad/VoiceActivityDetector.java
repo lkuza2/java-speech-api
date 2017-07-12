@@ -41,7 +41,7 @@ public class VoiceActivityDetector implements Runnable {
         DETECTED_SILENCE_AFTER_SPEECH
     }
 
-//    public void detectVoiceActivity(AudioInputStream audio) {
+    // TODO: optionally provide PipedInputStream to support streaming recogntion on Google
     public void detectVoiceActivity(MicrophoneAnalyzer mic, VoiceActivityListener listener) {
         this.listener = listener;
         this.mic = mic;
@@ -66,22 +66,26 @@ public class VoiceActivityDetector implements Runnable {
             try {
                 int bytesRead = this.audio.read(audioData);
 
+                int counter = 0;
                 int energy = mic.calculateRMSLevel(audioData);
                 int frequency = mic.getFrequency(audioData);
-                //     3-2-2- Compute the abstract value of Spectral Flatness Measure SFM(i)
+
+                // ignore frequencies above 400hz (and below 50Hz?)
+                if (frequency < 400) {
+                    //     3-2-2- Compute the abstract value of Spectral Flatness Measure SFM(i)
 // TODO        https://github.com/filipeuva/SoundBites/blob/master/src/uk/co/biogen/SoundBites/analysis/AnalysisInterface.java#L264
 
-                //   3-3- Supposing that some of the first 30 frames are silence, find the minimum value for E, F & SF
-                minEnergy = Math.min(minEnergy, energy);
-                minFrequency = Math.min(minFrequency, frequency);
+                    //   3-3- Supposing that some of the first 30 frames are silence, find the minimum value for E, F & SF
+                    minEnergy = Math.min(minEnergy, energy);
+                    minFrequency = Math.min(minFrequency, frequency);
 //                minSpectralFlatness = Math.min(minSpectralFlatness, energy);
 
-                double energyThreshold = ENERGY_PRIMARY_THRESHOLD * Math.log(minEnergy);
+                    double energyThreshold = ENERGY_PRIMARY_THRESHOLD * Math.log(minEnergy);
 
-                int counter = 0;
-                if (energy - minEnergy >= energyThreshold) counter++;
-                if (frequency - minFrequency >= FREQUENCY_PRIMARY_THRESHOLD) counter++;
-                if (sfm - minSpectralFlatness) >= SPECTRAL_FLATNESS_PRIMARY_THRESHOLD) counter++;
+                    if (energy - minEnergy >= energyThreshold) counter++;
+                    if (frequency - minFrequency >= FREQUENCY_PRIMARY_THRESHOLD) counter++;
+//                if (sfm - minSpectralFlatness) >= SPECTRAL_FLATNESS_PRIMARY_THRESHOLD) counter++;
+                }
 
                 if (counter > 1) {
                     // speech
@@ -114,7 +118,7 @@ public class VoiceActivityDetector implements Runnable {
                     minEnergy = ((silenceCount * minEnergy) + energy) / (silenceCount + 1);
                     //   Ignore silence runs less than 10 successive frames.
                     if (state == VadState.DETECTED_SPEECH && silenceCount >= IGNORE_SILENCE_WINDOWS) {
-                        if (speechCount > MIN_SPEECH_WINDOWS) {
+                        if (silenceCount >= MAX_SILENCE_WINDOWS && speechCount >= MIN_SPEECH_WINDOWS) {
                             // We have silence after a chunk of speech worth processing
                             emitVoiceActivity(outBuffer);
                             offset = 0;
