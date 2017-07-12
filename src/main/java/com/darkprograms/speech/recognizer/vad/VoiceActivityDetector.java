@@ -1,11 +1,14 @@
 package com.darkprograms.speech.recognizer.vad;
 
 import com.darkprograms.speech.microphone.MicrophoneAnalyzer;
+import com.darkprograms.speech.util.FFT;
 
 import javax.sound.sampled.AudioInputStream;
 
 /**
  * @see https://www.researchgate.net/publication/255667085_A_simple_but_efficient_real-time_voice_activity_detection_algorithm
+ *
+ * @see https://github.com/Sciss/SpeechRecognitionHMM/blob/master/src/main/java/org/ioe/tprsa/audio/preProcessings/EndPointDetection.java
  */
 public class VoiceActivityDetector {
 
@@ -27,9 +30,18 @@ public class VoiceActivityDetector {
         //  • Primary Threshold for SFM  (SF_PrimThresh)
         // 3- for i from 1 to numOfFrames
         //   3-1- Compute frame energy E(i)
+//        mic.calculateRMSLevel(byte[] audioData)
+
         //   3-2- Apply FFT on each speech frame.
-        //     3-2-1- Find kF(i) = arg max(S(k)) as the most dominant frequency component.
+//        FFT.fft(Complex[] x)
+//        https://github.com/Sciss/SpeechRecognitionHMM/blob/master/src/main/java/org/ioe/tprsa/audio/feature/FFT.java
+
+        //     3-2-1- Find F(i) = arg max(S(k)) as the most dominant frequency component.
+//        getFrequency(byte[] bytes)    ????
+
         //     3-2-2- Compute the abstract value of Spectral Flatness Measure SFM(i)
+//        https://github.com/filipeuva/SoundBites/blob/master/src/uk/co/biogen/SoundBites/analysis/AnalysisInterface.java#L264
+
         //         3-3- Supposing that some of the first 30 frames are silence, find the minimum value for E(minE) , F(minF) and SFM (minSF)
         //   3-4- Set Decision threshold forE, F and SFM
         //     • threshE = energyPrimThresh * log(minE)
