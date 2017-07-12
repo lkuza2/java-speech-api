@@ -1,6 +1,8 @@
 package com.darkprograms.speech.microphone;
 
 import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+
 import com.darkprograms.speech.util.*;
 
 /********************************************************************************************
@@ -85,8 +87,14 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * @param seconds The length in seconds
 	 * @return the number of bytes the microphone will output over the specified time.
 	 */
-	public int getNumOfBytes(double seconds){
-		return (int)(seconds*getAudioFormat().getSampleRate()*getAudioFormat().getFrameSize()+.5);
+	public int getNumOfBytes(double seconds) {
+		AudioFormat format = getAudioFormat();
+		return (int)(seconds * format.getSampleRate() * format.getFrameSize() + .5);
+	}
+
+	public int getNumOfFrames(int bytes) {
+		AudioFormat format = getAudioFormat();
+		return bytes / format.getFrameSize();
 	}
 	
 	/**
@@ -94,8 +102,8 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * @param numOfBytes The length of the returned array.
 	 * @return The specified array or null if it cannot.
 	 */
-	private byte[] getBytes(int numOfBytes){
-		if(getTargetDataLine()!=null){
+	private byte[] getBytes(int numOfBytes) {
+		if (getTargetDataLine()!=null) {
     		byte[] data = new byte[numOfBytes];
     		this.getTargetDataLine().read(data, 0, numOfBytes);
     		return data;
@@ -154,7 +162,7 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * Applies a Hanning Window to the data set.
 	 * Hanning Windows are used to increase the accuracy of the FFT.
 	 * One should always apply a window to a dataset before applying an FFT
-	 * @param The data you want to apply the window to
+	 * @param data The data you want to apply the window to
 	 * @return The windowed data set
 	 */
 	private double[] applyHanningWindow(double[] data){
@@ -165,9 +173,9 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * Applies a Hanning Window to the data set.
 	 * Hanning Windows are used to increase the accuracy of the FFT.
 	 * One should always apply a window to a dataset before applying an FFT
-	 * @param The data you want to apply the window to
-	 * @param The starting index you want to apply a window from
-	 * @param The size of the window
+	 * @param signal_in The data you want to apply the window to
+	 * @param pos The starting index you want to apply a window from
+	 * @param size The size of the window
 	 * @return The windowed data set
 	 */
 	private double[] applyHanningWindow(double[] signal_in, int pos, int size){
@@ -191,20 +199,20 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * @return The fundamental frequency in Hertz
 	 */
 	private int calculateFundamentalFrequency(Complex[] fftData, int N){
-		if(N<=0 || fftData == null){ return -1; } //error case
+		if (N <= 0 || fftData == null) { return -1; } //error case
 		
 		final int LENGTH = fftData.length;//Used to calculate bin size
 		fftData = removeNegativeFrequencies(fftData);
 		Complex[][] data = new Complex[N][fftData.length/N];
-		for(int i = 0; i<N; i++){
-			for(int j = 0; j<data[0].length; j++){
+		for (int i = 0; i<N; i++) {
+			for (int j = 0; j<data[0].length; j++) {
 				data[i][j] = fftData[j*(i+1)];
 			}
 		}
 		Complex[] result = new Complex[fftData.length/N];//Combines the arrays
-		for(int i = 0; i<result.length; i++){
+		for (int i = 0; i<result.length; i++) {
 			Complex tmp = new Complex(1,0);
-			for(int j = 0; j<N; j++){
+			for (int j = 0; j<N; j++) {
 				tmp = tmp.times(data[j][i]);
 			}
 			result[i] = tmp;
@@ -215,7 +223,7 @@ public class MicrophoneAnalyzer extends Microphone {
 
 	/**
 	 * Removes useless data from transform since sound doesn't use complex numbers.
-	 * @param The data you want to remove the complex transforms from
+	 * @param c The data you want to remove the complex transforms from
 	 * @return The cleaned data
 	 */
 	private Complex[] removeNegativeFrequencies(Complex[] c){
@@ -240,7 +248,7 @@ public class MicrophoneAnalyzer extends Microphone {
 
 	/**
 	 * Calculates index of the maximum magnitude in a complex array.
-	 * @param The Complex[] you want to get max magnitude from.
+	 * @param input The Complex[] you want to get max magnitude from.
 	 * @return The index of the max magnitude
 	 */
 	private int findMaxMagnitude(Complex[] input){

@@ -41,6 +41,7 @@ public class Microphone implements Closeable{
     private File audioFile;
 
     private AudioInputStream audioStream;
+    private float sampleRate;
 
     /**
      * Constructor
@@ -102,11 +103,11 @@ public class Microphone implements Closeable{
     /**
      * Initializes the target data line.
      */
-
     private void initTargetDataLine() {
         initTargetDataLine(8_000F);
     }
     private void initTargetDataLine(float sampleRate) {
+        this.sampleRate = sampleRate;
         DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
         try {
 			setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
@@ -115,7 +116,6 @@ public class Microphone implements Closeable{
 			e.printStackTrace();
 			return;
 		}
-
     }
 
     /**
@@ -130,6 +130,7 @@ public class Microphone implements Closeable{
         //Get Audio
 //        new Thread(new ListenThread()).start();
         open();
+        this.sampleRate = sampleRate;
         audioStream = new AudioInputStream(getTargetDataLine());
         return audioStream;
     }
@@ -170,7 +171,7 @@ public class Microphone implements Closeable{
      * @return Returns AudioFormat to be used later when capturing audio from microphone
      */
     public AudioFormat getAudioFormat() {
-        return getAudioFormat(8000.0F);
+        return getAudioFormat(sampleRate);
     }
 
     /**

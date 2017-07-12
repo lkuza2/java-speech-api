@@ -4,59 +4,140 @@ import com.darkprograms.speech.microphone.MicrophoneAnalyzer;
 import com.darkprograms.speech.util.FFT;
 
 import javax.sound.sampled.AudioInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
- * @see [https://www.researchgate.net/publication/255667085_A_simple_but_efficient_real-time_voice_activity_detection_algorithm]
+ * Implementation of [https://www.researchgate.net/publication/255667085_A_simple_but_efficient_real-time_voice_activity_detection_algorithm]
  *
  * @see [https://github.com/Sciss/SpeechRecognitionHMM/blob/master/src/main/java/org/ioe/tprsa/audio/preProcessings/EndPointDetection.java]
  */
-public class VoiceActivityDetector {
+public class VoiceActivityDetector implements Runnable {
+    private static final int WINDOW_MILLIS = 10;
+    private static final double WINDOW_SECONDS = WINDOW_MILLIS / 1000;
+    private static final int IGNORE_SILENCE_WINDOWS = 10;
+    private static final int IGNORE_SPEECH_WINDOWS = 5;
+    /** maximum ms between words */
+    private static final int MAX_SILENCE_MILLIS = 4;
+    /** minimum duration of speech to recognise */
+    private static final int MIN_SPEECH_MILLIS = 200;
+    private static final int MAX_SPEECH_MILLIS = 60_000;
+    private static final int MAX_SILENCE_WINDOWS = MAX_SILENCE_MILLIS / WINDOW_MILLIS;
+    private static final int MIN_SPEECH_WINDOWS = MIN_SPEECH_MILLIS / WINDOW_MILLIS;
+    private static final int MAX_SPEECH_WINDOWS = MAX_SPEECH_MILLIS / WINDOW_MILLIS;
+    private static final int ENERGY_PRIMARY_THRESHOLD = 40;
+    private static final int FREQUENCY_PRIMARY_THRESHOLD = 185;
+    private static final int SPECTRAL_FLATNESS_PRIMARY_THRESHOLD = 5;
 
-//        MicrophoneAnalyzer mic = new MicrophoneAnalyzer(null);
-//        mic.captureAudioToStream(16_000F);
-    public void detect(AudioInputStream audio) {
-        // E: short-term energy
-        // SFM: Spectral Flatness Measure - a measure of the noisiness of spectrum and is a good feature in Voiced/Unvoiced/Silence detection.
-        //    SFM = 10 log10(Gm/Am)
-        //    Am: arithmetic mean
-        //    Gm: geometric mean
-        // F: most dominant frequency component of the speech frame spectrum
+    private AudioInputStream audio;
+    private MicrophoneAnalyzer mic;
+    private VoiceActivityListener listener;
+    private VadState state;
 
+    private enum VadState {
+        LISTENING,
+        DETECTED_SPEECH,
+        DETECTED_SILENCE_AFTER_SPEECH
+    }
 
-        // 1- Set  Frame _ Size 10ms=and compute number of frames (FramesOfNum __ )(no frame overlap is required)
-        // 2- Set one primary threshold for each feature {These thresholds are the only parameters that are set externally}
-        //  • Primary Threshold for Energy (Energy_PrimThresh)
-        //  • Primary Threshold for F (F_PrimThresh)
-        //  • Primary Threshold for SFM  (SF_PrimThresh)
-        // 3- for i from 1 to numOfFrames
-        //   3-1- Compute frame energy E(i)
-//        mic.calculateRMSLevel(byte[] audioData)
+//    public void detectVoiceActivity(AudioInputStream audio) {
+    public void detectVoiceActivity(MicrophoneAnalyzer mic, VoiceActivityListener listener) {
+        this.listener = listener;
+        this.mic = mic;
+        this.audio = mic.captureAudioToStream(16_000F);
+        new Thread(this).start();
+    }
 
-        //   3-2- Apply FFT on each speech frame.
-//        FFT.fft(Complex[] x)
-//        https://github.com/Sciss/SpeechRecognitionHMM/blob/master/src/main/java/org/ioe/tprsa/audio/feature/FFT.java
+    public void run() {
+        byte[] audioData = new byte[mic.getNumOfBytes(WINDOW_SECONDS)];
+        int offset = 0;
+        int bufferSize = MAX_SPEECH_MILLIS * this.mic.getNumOfBytes(0.001);
+        int silenceCount = 0;
+        int speechCount = 0;
+        int minEnergy = Integer.MAX_VALUE;
+        int minFrequency = Integer.MAX_VALUE;
+        int minSpectralFlatness = Integer.MAX_VALUE;
+        ByteArrayOutputStream outBuffer = new ByteArrayOutputStream(bufferSize);
 
-        //     3-2-1- Find F(i) = arg max(S(k)) as the most dominant frequency component.
-//        getFrequency(byte[] bytes)    ????
+        state = VadState.LISTENING;
 
-        //     3-2-2- Compute the abstract value of Spectral Flatness Measure SFM(i)
-//        https://github.com/filipeuva/SoundBites/blob/master/src/uk/co/biogen/SoundBites/analysis/AnalysisInterface.java#L264
+        while (true) {
+            try {
+                int bytesRead = this.audio.read(audioData);
 
-        //         3-3- Supposing that some of the first 30 frames are silence, find the minimum value for E(minE) , F(minF) and SFM (minSF)
-        //   3-4- Set Decision threshold forE, F and SFM
-        //     • threshE = energyPrimThresh * log(minE)
-        //     • threshF = fPrimThresh
-        //     • threshSF = sfPrimThresh
-        //   3-5- Set 0=Counter
-        //     • if ((E(i) - minE) >= threshE) then ++Counter
-        //     • if ((F(i) - minF) >= threshF) then ++Counter
-        //     • if ((SFM(i) - minSF) >= threshSF) then ++Counter
-        //   3-6- If Counter > mark the current frame as speech else mark it as silence.
-        //   3-7- If current frame is marked as silence, update the energy minimum value:
-        //      minE = (silenceCount * minE) + E(i)) / (silenceCount + 1)
-        //   3-8- threshE = energyPrimThresh * log(minE)
-        //   4- Ignore silence run less than 10 successive frames.
-        //   5- Ignore speech run less than 5 successive frames.
+                int energy = mic.calculateRMSLevel(audioData);
+                int frequency = mic.getFrequency(audioData);
+                //     3-2-2- Compute the abstract value of Spectral Flatness Measure SFM(i)
+// TODO        https://github.com/filipeuva/SoundBites/blob/master/src/uk/co/biogen/SoundBites/analysis/AnalysisInterface.java#L264
 
+                //   3-3- Supposing that some of the first 30 frames are silence, find the minimum value for E, F & SF
+                minEnergy = Math.min(minEnergy, energy);
+                minFrequency = Math.min(minFrequency, frequency);
+//                minSpectralFlatness = Math.min(minSpectralFlatness, energy);
+
+                double energyThreshold = ENERGY_PRIMARY_THRESHOLD * Math.log(minEnergy);
+
+                int counter = 0;
+                if (energy - minEnergy >= energyThreshold) counter++;
+                if (frequency - minFrequency >= FREQUENCY_PRIMARY_THRESHOLD) counter++;
+                if (sfm - minSpectralFlatness) >= SPECTRAL_FLATNESS_PRIMARY_THRESHOLD) counter++;
+
+                if (counter > 1) {
+                    // speech
+                    speechCount++;
+                    // Ignore speech runs less than 5 successive frames.
+                    if (state != VadState.DETECTED_SPEECH && speechCount >= IGNORE_SPEECH_WINDOWS) {
+                        state = VadState.DETECTED_SPEECH;
+                        silenceCount = 0;
+                    }
+
+                    if (offset + bytesRead < bufferSize) {
+                        outBuffer.write(audioData, offset, bytesRead);
+                        offset += bytesRead;
+
+                        if (speechCount >= MAX_SPEECH_WINDOWS) {
+                            // in theory, this should be handled by the following end of buffer handler
+                            emitVoiceActivity(outBuffer);
+                            offset = 0;
+                        }
+                    } else {
+                        // Reached the end of the buffer! Send what we've captured so far
+                        bytesRead = bufferSize - offset;
+                        outBuffer.write(audioData, offset, bytesRead);
+                        emitVoiceActivity(outBuffer);
+                        offset = 0;
+                    }
+                } else {
+                    // silence
+                    silenceCount++;
+                    minEnergy = ((silenceCount * minEnergy) + energy) / (silenceCount + 1);
+                    //   Ignore silence runs less than 10 successive frames.
+                    if (state == VadState.DETECTED_SPEECH && silenceCount >= IGNORE_SILENCE_WINDOWS) {
+                        if (speechCount > MIN_SPEECH_WINDOWS) {
+                            // We have silence after a chunk of speech worth processing
+                            emitVoiceActivity(outBuffer);
+                            offset = 0;
+                        }
+
+                        state = VadState.DETECTED_SILENCE_AFTER_SPEECH;
+                        speechCount = 0;
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+    }
+
+    private void emitVoiceActivity(ByteArrayOutputStream outBuffer) {
+        listener.onVoiceeActivity(createVoiceActivityStream(outBuffer));
+        outBuffer.reset();
+        state = VadState.LISTENING;
+    }
+
+    private AudioInputStream createVoiceActivityStream(ByteArrayOutputStream outBuffer) {
+        return new AudioInputStream(new ByteArrayInputStream(outBuffer.toByteArray()), audio.getFormat(), mic.getNumOfFrames(outBuffer.size()));
     }
 }
