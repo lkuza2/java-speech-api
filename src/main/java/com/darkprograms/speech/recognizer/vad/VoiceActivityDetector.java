@@ -6,9 +6,9 @@ import com.darkprograms.speech.util.FFT;
 import javax.sound.sampled.AudioInputStream;
 
 /**
- * @see https://www.researchgate.net/publication/255667085_A_simple_but_efficient_real-time_voice_activity_detection_algorithm
+ * @see [https://www.researchgate.net/publication/255667085_A_simple_but_efficient_real-time_voice_activity_detection_algorithm]
  *
- * @see https://github.com/Sciss/SpeechRecognitionHMM/blob/master/src/main/java/org/ioe/tprsa/audio/preProcessings/EndPointDetection.java
+ * @see [https://github.com/Sciss/SpeechRecognitionHMM/blob/master/src/main/java/org/ioe/tprsa/audio/preProcessings/EndPointDetection.java]
  */
 public class VoiceActivityDetector {
 
