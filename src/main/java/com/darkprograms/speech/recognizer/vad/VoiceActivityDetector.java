@@ -8,6 +8,9 @@ import javax.sound.sampled.AudioInputStream;
  * @see https://www.researchgate.net/publication/255667085_A_simple_but_efficient_real-time_voice_activity_detection_algorithm
  */
 public class VoiceActivityDetector {
+
+//        MicrophoneAnalyzer mic = new MicrophoneAnalyzer(null);
+//        mic.captureAudioToStream(16_000F);
     public void detect(AudioInputStream audio) {
         // E: short-term energy
         // SFM: Spectral Flatness Measure - a measure of the noisiness of spectrum and is a good feature in Voiced/Unvoiced/Silence detection.
@@ -43,8 +46,5 @@ public class VoiceActivityDetector {
         //   4- Ignore silence run less than 10 successive frames.
         //   5- Ignore speech run less than 5 successive frames.
 
-
-//        MicrophoneAnalyzer mic = new MicrophoneAnalyzer(null);
-//        mic.captureAudioToStream(16_000F);
     }
 }
