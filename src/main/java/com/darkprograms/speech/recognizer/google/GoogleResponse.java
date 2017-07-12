@@ -1,4 +1,4 @@
-package com.darkprograms.speech.recognizer;
+package com.darkprograms.speech.recognizer.google;
 
 import java.util.ArrayList;
 import java.util.List;

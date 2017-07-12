@@ -1,4 +1,4 @@
-package com.darkprograms.speech.recognizer;
+package com.darkprograms.speech.recognizer.google;
 
 import java.io.File;
 import java.io.IOException;
@@ -184,7 +184,7 @@ public class GSpeechDuplex{
 	/**
 	 * This code opens a new Thread that connects to the downstream URL. Due to threading,
 	 * the best way to handle this is through the use of listeners.
-	 * @param The URL you want to connect to.
+	 * @param urlStr The URL you want to connect to.
 	 */
 	private Thread downChannel(String urlStr) {
 		final String url = urlStr;

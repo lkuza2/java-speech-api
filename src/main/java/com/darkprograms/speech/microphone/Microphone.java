@@ -40,6 +40,8 @@ public class Microphone implements Closeable{
      */
     private File audioFile;
 
+    private AudioInputStream audioStream;
+
     /**
      * Constructor
      *
@@ -100,7 +102,11 @@ public class Microphone implements Closeable{
     /**
      * Initializes the target data line.
      */
-    private void initTargetDataLine(){
+
+    private void initTargetDataLine() {
+        initTargetDataLine(8_000F);
+    }
+    private void initTargetDataLine(float sampleRate) {
         DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
         try {
 			setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
@@ -110,6 +116,22 @@ public class Microphone implements Closeable{
 			return;
 		}
 
+    }
+
+    /**
+     * @param sampleRate recommend 16_000F or 8_000F
+     */
+    public AudioInputStream captureAudioToStream(float sampleRate) {
+        setState(CaptureState.STARTING_CAPTURE);
+        if(getTargetDataLine() == null){
+            initTargetDataLine(sampleRate);
+        }
+
+        //Get Audio
+//        new Thread(new ListenThread()).start();
+        open();
+        audioStream = new AudioInputStream(getTargetDataLine());
+        return audioStream;
     }
 
 
@@ -129,8 +151,6 @@ public class Microphone implements Closeable{
 
         //Get Audio
         new Thread(new CaptureThread()).start();
-
-
     }
 
     /**
@@ -144,14 +164,19 @@ public class Microphone implements Closeable{
         captureAudioToFile(file);
     }
 
-	
     /**
      * The audio format to save in
      *
      * @return Returns AudioFormat to be used later when capturing audio from microphone
      */
     public AudioFormat getAudioFormat() {
-        float sampleRate = 8000.0F;
+        return getAudioFormat(8000.0F);
+    }
+
+    /**
+     * @param sampleRate set to 16_000.0F for AWS Lex
+     */
+    public AudioFormat getAudioFormat(float sampleRate) {
         //8000,11025,16000,22050,44100
         int sampleSizeInBits = 16;
         //8,16
@@ -183,7 +208,6 @@ public class Microphone implements Closeable{
 				return;
 			}
         }
-
     }
 
     /**
@@ -203,7 +227,6 @@ public class Microphone implements Closeable{
      * Thread to capture the audio from the microphone and save it to a file
      */
     private class CaptureThread implements Runnable {
-
         /**
          * Run method for thread
          */
@@ -220,4 +243,14 @@ public class Microphone implements Closeable{
         }
     }
 
+    /*private class ListenThread implements Runnable {
+        public void run() {
+            try {
+                open();
+                audioStream = new AudioInputStream(getTargetDataLine());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }*/
 }

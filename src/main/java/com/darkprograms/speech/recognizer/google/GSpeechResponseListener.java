@@ -1,4 +1,5 @@
-package com.darkprograms.speech.recognizer;
+package com.darkprograms.speech.recognizer.google
+		;
 
 /**
  * Response listeners for URL connections.

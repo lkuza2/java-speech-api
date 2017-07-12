@@ -1,4 +1,4 @@
-package com.darkprograms.speech.recognizer;
+package com.darkprograms.speech.encoding;
 
 import net.sourceforge.javaflacencoder.FLACEncoder;
 import net.sourceforge.javaflacencoder.FLACFileOutputStream;

@@ -1,4 +1,4 @@
-package com.darkprograms.speech.recognizer;
+package com.darkprograms.speech.recognizer.google;
 
 import java.util.*;
 import java.io.*;
@@ -7,6 +7,8 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 
 import org.json.*;
+
+import com.darkprograms.speech.encoding.FlacEncoder;
 
 /***************************************************************
  * Class that submits FLAC audio and retrieves recognized text
