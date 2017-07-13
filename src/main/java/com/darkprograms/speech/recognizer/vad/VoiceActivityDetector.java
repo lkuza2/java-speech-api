@@ -22,7 +22,7 @@ public class VoiceActivityDetector implements Runnable {
     private static final int MAX_SILENCE_MILLIS = 4;
     /** minimum duration of speech to recognise */
     private static final int MIN_SPEECH_MILLIS = 200;
-    private static final int MAX_SPEECH_MILLIS = 60_000;
+    private static final int MAX_SPEECH_MILLIS = 10_000;
     private static final int MAX_SILENCE_WINDOWS = MAX_SILENCE_MILLIS / WINDOW_MILLIS;
     private static final int MIN_SPEECH_WINDOWS = MIN_SPEECH_MILLIS / WINDOW_MILLIS;
     private static final int MAX_SPEECH_WINDOWS = MAX_SPEECH_MILLIS / WINDOW_MILLIS;
@@ -81,7 +81,7 @@ public class VoiceActivityDetector implements Runnable {
 //                minSpectralFlatness = Math.min(minSpectralFlatness, energy);
 
                     double energyThreshold = ENERGY_PRIMARY_THRESHOLD * Math.log(minEnergy);
-
+System.out.println("energy: " + energy + "\tfrequency:" + frequency);
                     if (energy - minEnergy >= energyThreshold) counter++;
                     if (frequency - minFrequency >= FREQUENCY_PRIMARY_THRESHOLD) counter++;
 //                if (sfm - minSpectralFlatness) >= SPECTRAL_FLATNESS_PRIMARY_THRESHOLD) counter++;
@@ -97,7 +97,8 @@ public class VoiceActivityDetector implements Runnable {
                     }
 
                     if (offset + bytesRead < bufferSize) {
-                        outBuffer.write(audioData, offset, bytesRead);
+System.out.println("                                                              offset: " + offset + " \t bytesRead: " + bytesRead);
+                        outBuffer.write(audioData, 0, bytesRead);
                         offset += bytesRead;
 
                         if (speechCount >= MAX_SPEECH_WINDOWS) {
@@ -108,7 +109,7 @@ public class VoiceActivityDetector implements Runnable {
                     } else {
                         // Reached the end of the buffer! Send what we've captured so far
                         bytesRead = bufferSize - offset;
-                        outBuffer.write(audioData, offset, bytesRead);
+                        outBuffer.write(audioData, 0, bytesRead);
                         emitVoiceActivity(outBuffer);
                         offset = 0;
                     }
@@ -121,6 +122,8 @@ public class VoiceActivityDetector implements Runnable {
                         if (silenceCount >= MAX_SILENCE_WINDOWS && speechCount >= MIN_SPEECH_WINDOWS) {
                             // We have silence after a chunk of speech worth processing
                             emitVoiceActivity(outBuffer);
+                            outBuffer.reset();
+//TODO: is offset needed?
                             offset = 0;
                         }
 

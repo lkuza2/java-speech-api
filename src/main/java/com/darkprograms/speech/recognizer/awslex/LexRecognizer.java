@@ -133,9 +133,12 @@ public class LexRecognizer {
         PostContentRequest request = new PostContentRequest()
                 .withBotName(botName)
                 .withBotAlias(botAlias)
-                .withInputStream(stream)
                 .withUserId(userId)
+                .withInputStream(stream)
+                .withContentType("audio/l16; rate=16000; channels=1")
                 .withSessionAttributes(sessionAttributes);
+
+        System.out.println("sending request to Lex: " + request);
 
         PostContentResult result = lex.postContent(request);
         return new LexResponse(result);
