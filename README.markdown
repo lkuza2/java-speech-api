@@ -11,6 +11,7 @@ The J.A.R.V.I.S. Speech API is designed to be simple and efficient, using the sp
 The API currently provides the following functionality,
 
   * Microphone Capture API (Wrapped around the current Java API for simplicity)
+  * Voice Activity Detector
   * A speech recognizer using Google's recognizer service
       * Converts WAVE files from microphone input to FLAC (using existing API, see CREDITS)
       * Retrieves Response from Google, including confidence score and text
