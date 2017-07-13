@@ -56,6 +56,15 @@ public class Microphone implements Closeable{
     }
 
     /**
+     * Constructor for use with {@link #captureAudioToStream(float sampleRate)}
+     * @param sampleRate
+     */
+    public Microphone(float sampleRate) {
+        setState(CaptureState.CLOSED);
+        initTargetDataLine(sampleRate);
+    }
+
+    /**
      * Gets the current state of Microphone
      *
      * @return PROCESSING_AUDIO is returned when the Thread is recording Audio and/or saving it to a file<br>
