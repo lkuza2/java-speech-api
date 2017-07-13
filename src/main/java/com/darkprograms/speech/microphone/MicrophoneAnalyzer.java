@@ -333,7 +333,7 @@ ps = powerSpectrum()
 		//Calculates Maximum Magnitude of the array
 		double max = Double.MIN_VALUE;
 		int index = -1;
-		for(int i = 0; i<input.length; i++){
+		for(int i = 1; i < input.length; i++){
 			Complex c = input[i];
 			double tmp = c.getMagnitude();
 			if(tmp>max){
@@ -354,8 +354,9 @@ ps = powerSpectrum()
 	    final int bytesRecorded = bufferData.length;
 		final int bytesPerSample = getAudioFormat().getSampleSizeInBits()/8; 
 	    final double amplification = 100.0; // choose a number as you like
-	    double[] micBufferData = new double[bytesRecorded - bytesPerSample +1];
-	    for (int index = 0, floatIndex = 0; index < bytesRecorded - bytesPerSample + 1; index += bytesPerSample, floatIndex++) {
+		int micBufferLength = bytesRecorded;  // bytesRecorded - bytesPerSample +1
+	    double[] micBufferData = new double[micBufferLength];
+	    for (int index = 0, floatIndex = 0; index < micBufferLength; index += bytesPerSample, floatIndex++) {
 	        double sample = 0;
 	        for (int b = 0; b < bytesPerSample; b++) {
 	            int v = bufferData[index + b];

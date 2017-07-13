@@ -14,7 +14,7 @@ import java.io.IOException;
  * @see [https://github.com/Sciss/SpeechRecognitionHMM/blob/master/src/main/java/org/ioe/tprsa/audio/preProcessings/EndPointDetection.java]
  */
 public class VoiceActivityDetector implements Runnable {
-    private static final int WINDOW_MILLIS = 10;
+    private static final int WINDOW_MILLIS = 8;
     private static final double WINDOW_SECONDS = (double)WINDOW_MILLIS / 1000;
     private static final int IGNORE_SILENCE_WINDOWS = 10;
     private static final int IGNORE_SPEECH_WINDOWS = 5;
@@ -87,7 +87,7 @@ public class VoiceActivityDetector implements Runnable {
 //                if (sfm - minSpectralFlatness) >= SPECTRAL_FLATNESS_PRIMARY_THRESHOLD) counter++;
                 }
 
-                if (counter > 1) {
+                if (counter >= 0) {
                     // speech
                     speechCount++;
                     // Ignore speech runs less than 5 successive frames.
