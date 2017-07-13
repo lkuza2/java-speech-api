@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 public class VoiceActivityDetector implements Runnable {
     private static final int WINDOW_MILLIS = 10;
-    private static final double WINDOW_SECONDS = WINDOW_MILLIS / 1000;
+    private static final double WINDOW_SECONDS = (double)WINDOW_MILLIS / 1000;
     private static final int IGNORE_SILENCE_WINDOWS = 10;
     private static final int IGNORE_SPEECH_WINDOWS = 5;
     /** maximum ms between words */
@@ -46,7 +46,7 @@ public class VoiceActivityDetector implements Runnable {
         this.listener = listener;
         this.mic = mic;
         this.audio = mic.captureAudioToStream();
-        new Thread(this).start();
+        new Thread(this, "JARVIS-VAD").start();
     }
 
     public void run() {
