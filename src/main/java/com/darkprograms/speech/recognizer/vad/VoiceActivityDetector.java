@@ -45,7 +45,7 @@ public class VoiceActivityDetector implements Runnable {
     public void detectVoiceActivity(MicrophoneAnalyzer mic, VoiceActivityListener listener) {
         this.listener = listener;
         this.mic = mic;
-        this.audio = mic.captureAudioToStream(16_000F);
+        this.audio = mic.captureAudioToStream();
         new Thread(this).start();
     }
 
@@ -136,7 +136,7 @@ public class VoiceActivityDetector implements Runnable {
     }
 
     private void emitVoiceActivity(ByteArrayOutputStream outBuffer) {
-        listener.onVoiceeActivity(createVoiceActivityStream(outBuffer));
+        listener.onVoiceActivity(createVoiceActivityStream(outBuffer));
         outBuffer.reset();
         state = VadState.LISTENING;
     }

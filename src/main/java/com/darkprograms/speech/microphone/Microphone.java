@@ -56,7 +56,7 @@ public class Microphone implements Closeable{
     }
 
     /**
-     * Constructor for use with {@link #captureAudioToStream(float sampleRate)}
+     * Constructor for use with {@link #captureAudioToStream()}
      * @param sampleRate samples per second - 16_000 (recommended) or 8_000
      */
     public Microphone(float sampleRate) {
@@ -127,13 +127,10 @@ public class Microphone implements Closeable{
 		}
     }
 
-    /**
-     * @param sampleRate recommend 16_000F or 8_000F
-     */
-    public AudioInputStream captureAudioToStream(float sampleRate) {
+    public AudioInputStream captureAudioToStream() {
         setState(CaptureState.STARTING_CAPTURE);
         if(getTargetDataLine() == null){
-            initTargetDataLine(sampleRate);
+            initTargetDataLine();
         }
 
         //Get Audio

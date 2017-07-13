@@ -36,6 +36,20 @@ public class LexRecogniser {
         this.userId = userId;
     }
 
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public LexResponse getRecognizedDataForStream(AudioInputStream stream) {
+        return getRecognizedDataForStream(stream, (String)null);
+    }
+
+    /**
+     * @see #getRecognizedDataForStreamWithObjects(AudioInputStream, Map)
+     * @param stream
+     * @param sessionAttributes simple key:value attributes
+     * @return
+     */
     public RecognitionResult getRecognizedDataForStream(AudioInputStream stream, Map<String, String> sessionAttributes) {
         String json;
         if (sessionAttributes == null || sessionAttributes.isEmpty()) {
@@ -67,6 +81,12 @@ public class LexRecogniser {
         return getRecognizedDataForStream(stream, new String(Base64.getEncoder().encode(json.getBytes())));
     }
 
+    /**
+     * Each value of sesssionAttributes will be converted to a String containing JSON
+     * @param stream
+     * @param sessionAttributes
+     * @return
+     */
     public RecognitionResult getRecognizedDataForStreamWithObjects(AudioInputStream stream, Map<String, Object> sessionAttributes) {
         String json;
         if (sessionAttributes == null || sessionAttributes.isEmpty()) {
@@ -109,7 +129,7 @@ public class LexRecogniser {
      * @param sessionAttributes The value must be map (keys and values must be strings) that is JSON serialized and then base64 encoded
      * @return
      */
-    public RecognitionResult getRecognizedDataForStream(AudioInputStream stream, String sessionAttributes) {
+    public LexResponse getRecognizedDataForStream(AudioInputStream stream, String sessionAttributes) {
         PostContentRequest request = new PostContentRequest()
                 .withBotName(botName)
                 .withBotAlias(botAlias)
