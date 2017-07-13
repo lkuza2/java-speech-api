@@ -6,7 +6,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 
-import com.darkprograms.speech.recognizer.SpeechRecogniser;
+import com.darkprograms.speech.recognizer.SpeechRecognizer;
 import org.json.*;
 
 import com.darkprograms.speech.encoding.FlacEncoder;
@@ -16,7 +16,7 @@ import com.darkprograms.speech.encoding.FlacEncoder;
  *
  * @author Luke Kuza, Duncan Jauncey, Aaron Gokaslan
  **************************************************************/
-public class Recognizer implements SpeechRecogniser {
+public class Recognizer implements SpeechRecognizer {
 
     public enum Languages{
 		AUTO_DETECT("auto"),//tells Google to auto-detect the language

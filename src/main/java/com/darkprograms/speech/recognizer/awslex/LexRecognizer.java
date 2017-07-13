@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * example:
  * <pre>
- LexRecogniser lex = new LexRecogniser(AmazonLexRuntimeClientBuilder.defaultClient(), "MyLexBot", "PROD", "auser");
+ LexRecognizer lex = new LexRecognizer(AmazonLexRuntimeClientBuilder.defaultClient(), "MyLexBot", "PROD", "auser");
  MicrophoneAnalyzer mic = new MicrophoneAnalyzer(null);
  VoiceActivityDetector vad = new VoiceActivityDetector();
 
@@ -23,13 +23,13 @@ import java.util.Map;
  });
  * </pre>
  */
-public class LexRecogniser {
+public class LexRecognizer {
     private AmazonLexRuntime lex;
     private String botName;
     private String botAlias;
     private String userId;
 
-    public LexRecogniser(AmazonLexRuntime lex, String botName, String botAlias, String userId) {
+    public LexRecognizer(AmazonLexRuntime lex, String botName, String botAlias, String userId) {
         this.lex = lex;
         this.botName = botName;
         this.botAlias = botAlias;
