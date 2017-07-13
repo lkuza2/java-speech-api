@@ -57,7 +57,7 @@ public class Microphone implements Closeable{
 
     /**
      * Constructor for use with {@link #captureAudioToStream(float sampleRate)}
-     * @param sampleRate
+     * @param sampleRate samples per second - 16_000 (recommended) or 8_000
      */
     public Microphone(float sampleRate) {
         setState(CaptureState.CLOSED);

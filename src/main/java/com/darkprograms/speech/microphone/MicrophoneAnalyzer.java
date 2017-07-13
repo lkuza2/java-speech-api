@@ -22,6 +22,14 @@ public class MicrophoneAnalyzer extends Microphone {
 	public MicrophoneAnalyzer(AudioFileFormat.Type fileType){
 		super(fileType);
 	}
+
+	/**
+	 * Constructor for use with {@link #captureAudioToStream(float sampleRate)}
+	 * @param sampleRate samples per second - 16_000 (recommended) or 8_000
+	 */
+	public MicrophoneAnalyzer(float sampleRate){
+		super(sampleRate);
+	}
 	
     /**
      * Gets the volume of the microphone input
