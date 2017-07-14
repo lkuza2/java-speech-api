@@ -133,14 +133,10 @@ public class Microphone implements Closeable{
             initTargetDataLine();
         }
 
-        //Get Audio
-//        new Thread(new ListenThread()).start();
         open();
-        this.sampleRate = sampleRate;
         audioStream = new AudioInputStream(getTargetDataLine());
         return audioStream;
     }
-
 
     /**
      * Captures audio from the microphone and saves it a file

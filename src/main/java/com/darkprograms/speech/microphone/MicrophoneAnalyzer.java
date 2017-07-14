@@ -24,7 +24,7 @@ public class MicrophoneAnalyzer extends Microphone {
 	}
 
 	/**
-	 * Constructor for use with {@link #captureAudioToStream(float sampleRate)}
+	 * Constructor for use with {@link #captureAudioToStream()}
 	 * @param sampleRate samples per second - 16_000 (recommended) or 8_000
 	 */
 	public MicrophoneAnalyzer(float sampleRate){
@@ -126,7 +126,7 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * be in error due to the complex nature of sound. This feature is in Beta
 	 * @return The frequency of the sound in Hertz.
 	 */
-	public int getFrequency(){
+	public int getFrequency() {
 		try {
 			return getFrequency(4096);
 		} catch (Exception e) {
