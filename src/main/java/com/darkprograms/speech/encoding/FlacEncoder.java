@@ -32,8 +32,6 @@ public class FlacEncoder {
      * @param outputFile Output FLAC file
      */
     public void convertWaveToFlac(File inputFile, File outputFile) {
-
-
         StreamConfiguration streamConfiguration = new StreamConfiguration();
         streamConfiguration.setSampleRate(8000);
         streamConfiguration.setBitsPerSample(16);
