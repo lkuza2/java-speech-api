@@ -24,7 +24,7 @@ public class SimpleVAD extends AbstractVAD {
     @Override
     protected boolean sampleForSpeech(byte[] audioData) {
         int volume = mic.calculateRMSLevel(audioData);
-System.out.println(volume);
+//System.out.println(volume);
         if (volume > ambientVolume + threshold) {
             speakingVolume = volume;
             speaking = true;

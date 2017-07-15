@@ -112,24 +112,26 @@ public class Microphone implements Closeable{
     /**
      * Initializes the target data line.
      */
-    private void initTargetDataLine() {
-        initTargetDataLine(8_000F);
+    private TargetDataLine initTargetDataLine() {
+        return initTargetDataLine(8_000F);
     }
-    private void initTargetDataLine(float sampleRate) {
+    private TargetDataLine initTargetDataLine(float sampleRate) {
         this.sampleRate = sampleRate;
         DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
         try {
-			setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
+            TargetDataLine targetDataLine = (TargetDataLine)AudioSystem.getLine(dataLineInfo);
+			setTargetDataLine(targetDataLine);
+			return targetDataLine;
 		} catch (LineUnavailableException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return;
+			return null;
 		}
     }
 
     public AudioInputStream captureAudioToStream() {
         setState(CaptureState.STARTING_CAPTURE);
-        if(getTargetDataLine() == null){
+        if(getTargetDataLine() == null) {
             initTargetDataLine();
         }
 
@@ -200,10 +202,40 @@ public class Microphone implements Closeable{
         if(getTargetDataLine()==null){
         	initTargetDataLine();
         }
-        if(!getTargetDataLine().isOpen() && !getTargetDataLine().isRunning() && !getTargetDataLine().isActive()){
+        TargetDataLine targetDataLine = getTargetDataLine();
+        if(!targetDataLine.isOpen() && !targetDataLine.isRunning() && !targetDataLine.isActive()) {
            	try {
                 setState(CaptureState.PROCESSING_AUDIO);
+
+                try {
+System.out.println("???????????????????????????????????????????????????????????");
+                    System.out.println("???????????????????????????????????????????????????????????");System.out.println("???????????????????????????????????????????????????????????");System.out.println("???????????????????????????????????????????????????????????");
+                    System.out.println("???????????????????????????????????????????????????????????");
+
+
+                    if (targetDataLine.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        FloatControl gainControl = (FloatControl) getTargetDataLine().getControl(FloatControl.Type.MASTER_GAIN);
+                        gainControl.setValue(40);
+                    }
+                } catch (Exception e) {
+                    try {
+                        FloatControl gainControl = (FloatControl) getTargetDataLine().getControl(FloatControl.Type.VOLUME);
+                        gainControl.setValue(-10);
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                }
         		getTargetDataLine().open(getAudioFormat());
+
             	getTargetDataLine().start();
 			} catch (LineUnavailableException e) {
 				// TODO Auto-generated catch block

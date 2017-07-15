@@ -16,7 +16,7 @@ public class RecordingListener implements VoiceActivityListener {
     @Override
     public void onVoiceActivity(AudioInputStream audioInputStream) {
         String fileName = new Date().toString() + ".wav";
-        File out = new File("/temp", fileName);
+        File out = new File("/tmp", fileName);
 
         try {
             System.out.println("Saving recoring to " + out.getAbsolutePath());

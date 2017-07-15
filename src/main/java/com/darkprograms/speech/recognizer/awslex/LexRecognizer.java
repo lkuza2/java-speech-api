@@ -7,6 +7,7 @@ import com.darkprograms.speech.recognizer.RecognitionResult;
 import org.json.JSONObject;
 
 import javax.sound.sampled.AudioInputStream;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.Map;
 
@@ -138,7 +139,8 @@ public class LexRecognizer {
                 .withContentType("audio/l16; rate=16000; channels=1")
                 .withSessionAttributes(sessionAttributes);
 
-        System.out.println("sending request to Lex: " + request);
+//      System.out.println("sending request to Lex: " + request);
+//        try {System.out.println(">> " + stream.available());} catch (IOException e) {}
 
         PostContentResult result = lex.postContent(request);
         return new LexResponse(result);

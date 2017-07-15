@@ -22,14 +22,14 @@ public abstract class AbstractVAD implements VoiceActivityDetector, Runnable {
     private static final int MIN_SPEECH_WINDOWS = MIN_SPEECH_MILLIS / WINDOW_MILLIS;
 
     protected AudioInputStream audio;
-    protected MicrophoneAnalyzer mic;
-    protected VoiceActivityListener listener;
-    protected VadState state;
+    MicrophoneAnalyzer mic;
+    private VoiceActivityListener listener;
+    private VadState state;
 
-    protected int maxSpeechMs;
-    protected int maxSpeechWindows;
-    protected int silenceCount;
-    protected int speechCount;
+    private int maxSpeechMs;
+    private int maxSpeechWindows;
+    int silenceCount;
+    private int speechCount;
 
     private int offset;
     private int bufferSize;
