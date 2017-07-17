@@ -19,7 +19,11 @@ public interface VoiceActivityDetector {
         CLOSED
     }
 
+    void start();
+    void terminate();
+
     // TODO: optionally provide PipedInputStream to support streaming recognition on Google
     void detectVoiceActivity(MicrophoneAnalyzer mic, VoiceActivityListener listener);
     void detectVoiceActivity(MicrophoneAnalyzer mic, int maxSpeechMs, VoiceActivityListener listener);
+    void setVoiceActivityListener(VoiceActivityListener listener);
 }

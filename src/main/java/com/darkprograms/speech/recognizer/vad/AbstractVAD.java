@@ -1,5 +1,6 @@
 package com.darkprograms.speech.recognizer.vad;
 
+import com.darkprograms.speech.microphone.Microphone;
 import com.darkprograms.speech.microphone.MicrophoneAnalyzer;
 
 import javax.sound.sampled.AudioInputStream;
@@ -25,6 +26,7 @@ public abstract class AbstractVAD implements VoiceActivityDetector, Runnable {
     MicrophoneAnalyzer mic;
     private VoiceActivityListener listener;
     private VadState state;
+    private Thread thread;
 
     private int maxSpeechMs;
     private int maxSpeechWindows;
@@ -41,13 +43,46 @@ public abstract class AbstractVAD implements VoiceActivityDetector, Runnable {
     }
 
     /** Initialise the VAD and start a thread */
+    @Override
     public void detectVoiceActivity(MicrophoneAnalyzer mic, int maxSpeechMs, VoiceActivityListener listener) {
         this.listener = listener;
-        this.mic = mic;
-        this.audio = mic.captureAudioToStream();
         this.maxSpeechMs = maxSpeechMs;
         maxSpeechWindows = maxSpeechMs / WINDOW_MILLIS;
-        new Thread(this, "JARVIS-VAD").start();
+
+        if (this.mic != null) {
+            if (this.mic == mic) {
+                // re-open the same mic
+                if (mic.getState() == Microphone.CaptureState.CLOSED) {
+                    mic.open();
+                }
+                return;
+            } else {
+                // swap mics
+                this.audio = mic.captureAudioToStream();
+                this.mic.close();
+            }
+        } else {
+            this.audio = mic.captureAudioToStream();
+        }
+
+        this.mic = mic;
+    }
+
+    @Override
+    public void setVoiceActivityListener(VoiceActivityListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public void start() {
+        thread = new Thread(this, "JARVIS-VAD");
+        thread.start();
+    }
+
+    @Override
+    public void terminate() {
+//        state = VadState.CLOSED;
+        thread.interrupt();
     }
 
     /**
@@ -67,7 +102,7 @@ public abstract class AbstractVAD implements VoiceActivityDetector, Runnable {
 
         state = VoiceActivityDetector.VadState.LISTENING;
 
-        while (true) {
+        while (state != VadState.CLOSED) {
             try {
                 int bytesRead = this.audio.read(audioData, 0, bytesToRead);
                 boolean speechDetected = sampleForSpeech(audioData);
@@ -101,11 +136,11 @@ public abstract class AbstractVAD implements VoiceActivityDetector, Runnable {
                 offset += bytesRead;
 
                 if (speechCount >= maxSpeechWindows) {
-                    // in theory, this should be handled by the following end of buffer handler
+                    System.out.println("in theory, this should be handled by the following end of buffer handler");
                     emitVoiceActivity(outBuffer);
                 }
             } else {
-                // Reached the end of the buffer! Send what we've captured so far
+                System.out.println("Reached the end of the buffer! Send what we've captured so far");
                 bytesRead = bufferSize - offset;
                 outBuffer.write(audioData, 0, bytesRead);
                 emitVoiceActivity(outBuffer);
@@ -117,7 +152,7 @@ public abstract class AbstractVAD implements VoiceActivityDetector, Runnable {
             //   Ignore silence runs less than 10 successive frames.
             if (state == VoiceActivityDetector.VadState.DETECTED_SPEECH && silenceCount >= IGNORE_SILENCE_WINDOWS) {
                 if (silenceCount >= MAX_SILENCE_WINDOWS && speechCount >= MIN_SPEECH_WINDOWS) {
-                    // We have silence after a chunk of speech worth processing
+                    System.out.println("We have silence after a chunk of speech worth processing");
                     emitVoiceActivity(outBuffer);
                 } else {
                     state = VoiceActivityDetector.VadState.DETECTED_SILENCE_AFTER_SPEECH;
@@ -136,7 +171,7 @@ public abstract class AbstractVAD implements VoiceActivityDetector, Runnable {
     }
 
     protected AudioInputStream createVoiceActivityStream(ByteArrayOutputStream outBuffer) {
+        System.out.println("speech: " + mic.getAudioFormat().getFrameSize() * mic.getNumOfFrames(outBuffer.size()));
         return new AudioInputStream(new ByteArrayInputStream(outBuffer.toByteArray()), audio.getFormat(), mic.getNumOfFrames(outBuffer.size()));
     }
-
 }
