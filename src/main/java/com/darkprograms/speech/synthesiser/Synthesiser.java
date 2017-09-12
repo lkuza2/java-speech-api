@@ -2,22 +2,10 @@ package com.darkprograms.speech.synthesiser;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.SequenceInputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import com.darkprograms.speech.translator.GoogleTranslate;
 
 
 

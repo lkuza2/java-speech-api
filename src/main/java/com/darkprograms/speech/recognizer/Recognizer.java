@@ -268,7 +268,7 @@ public class Recognizer {
     private void parseResponse(String[] rawResponse, GoogleResponse googleResponse) {
 
         for(String s : rawResponse) {
-            JSONObject jsonResponse = new JSONObject(s);
+			JSONObject jsonResponse = new JSONObject(s);
             JSONArray jsonResultArray = jsonResponse.getJSONArray("result");
             for(int i = 0; i < jsonResultArray.length(); i++) {
                 JSONObject jsonAlternativeObject = jsonResultArray.getJSONObject(i);
