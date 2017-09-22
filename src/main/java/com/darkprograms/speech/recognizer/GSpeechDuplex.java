@@ -75,6 +75,11 @@ public class GSpeechDuplex {
 	private static final byte[] FINAL_CHUNK = new byte[]{ '0' , '\r' , '\n' , '\r' , '\n' };
 	
 	/**
+	 * The AudioInputStream used in Upstream Thread
+	 */
+	private AudioInputStream ais;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param API_KEY
@@ -332,13 +337,13 @@ public class GSpeechDuplex {
 			// this opens a connection, then sends POST & headers.
 			final OutputStream out = httpConn.getOutputStream();
 			//Note : if the audio is more than 15 seconds
-			// dont write it to UrlConnInputStream all in one block as this sample does.
+			// don't write it to UrlConnInputStream all in one block as this sample does.
 			// Rather, segment the byteArray and on intermittently, sleeping thread
 			// supply bytes to the urlConn Stream at a rate that approaches
 			// the bitrate ( =30K per sec. in this instance ).
 			System.out.println("Starting to write data to output...");
-			final AudioInputStream ais = new AudioInputStream(mtl);
-			;
+			ais = new AudioInputStream(mtl);
+			
 			AudioSystem.write(ais, FLACFileWriter.FLAC, out);
 			//Output Stream is automatically closed
 			// do you need the trailer?
@@ -353,6 +358,17 @@ public class GSpeechDuplex {
 			System.out.println("Upstream Closed...");
 		} catch (IOException ex) {
 			ex.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Force HttpsPostConnection Thread to Stop , Closes this audio input stream and releases any system resources associated with the stream.
+	 */
+	public void stopSpeechRecognition() {
+		try {
+			ais.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
