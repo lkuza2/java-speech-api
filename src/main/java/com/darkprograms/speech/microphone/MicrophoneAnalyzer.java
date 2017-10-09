@@ -1,6 +1,8 @@
 package com.darkprograms.speech.microphone;
 
 import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+
 import com.darkprograms.speech.util.*;
 
 /********************************************************************************************
@@ -19,6 +21,14 @@ public class MicrophoneAnalyzer extends Microphone {
 	 */
 	public MicrophoneAnalyzer(AudioFileFormat.Type fileType){
 		super(fileType);
+	}
+
+	/**
+	 * Constructor for use with {@link #captureAudioToStream()}
+	 * @param sampleRate samples per second - 16_000 (recommended) or 8_000
+	 */
+	public MicrophoneAnalyzer(float sampleRate){
+		super(sampleRate);
 	}
 	
     /**
@@ -85,8 +95,14 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * @param seconds The length in seconds
 	 * @return the number of bytes the microphone will output over the specified time.
 	 */
-	public int getNumOfBytes(double seconds){
-		return (int)(seconds*getAudioFormat().getSampleRate()*getAudioFormat().getFrameSize()+.5);
+	public int getNumOfBytes(double seconds) {
+		AudioFormat format = getAudioFormat();
+		return (int)(seconds * format.getSampleRate() * format.getFrameSize() + .5);
+	}
+
+	public int getNumOfFrames(int bytes) {
+		AudioFormat format = getAudioFormat();
+		return bytes / format.getFrameSize();
 	}
 	
 	/**
@@ -94,8 +110,8 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * @param numOfBytes The length of the returned array.
 	 * @return The specified array or null if it cannot.
 	 */
-	private byte[] getBytes(int numOfBytes){
-		if(getTargetDataLine()!=null){
+	private byte[] getBytes(int numOfBytes) {
+		if (getTargetDataLine()!=null) {
     		byte[] data = new byte[numOfBytes];
     		this.getTargetDataLine().read(data, 0, numOfBytes);
     		return data;
@@ -110,7 +126,7 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * be in error due to the complex nature of sound. This feature is in Beta
 	 * @return The frequency of the sound in Hertz.
 	 */
-	public int getFrequency(){
+	public int getFrequency() {
 		try {
 			return getFrequency(4096);
 		} catch (Exception e) {
@@ -149,12 +165,82 @@ public class MicrophoneAnalyzer extends Microphone {
 		Complex[] fftTransformed = FFT.fft(complex);
 		return this.calculateFundamentalFrequency(fftTransformed, 4);
 	}
+
+/*	*//**
+	 * borrowed from http://www.programcreek.com/java-api-examples/index.php?source_dir=Audio-Descriptors-master/src/audio/descriptors/AudioDescriptor.java
+	 *
+	 * Spectral flatness provides a way to quantify how tone-like a sound is, as opposed to
+	 * being noise-like. The meaning of tonal in this context is in the sense of the amount of peaks
+	 * or resonant structure in a power spectrum, as opposed to flat spectrum of a white noise.
+	 *
+	 *  @param bytes
+	 *  @return Spectral Flatness coefficient
+	 *//*
+	public int calculateSpectralFlatness(byte[] bytes) {
+		// compute FFT
+		FFT f = new FFT(x.bufferSize(), x.sampleRate());
+		f.window(FFT.HAMMING);
+		f.forward(x.right);
+
+		float num = 1;
+		float den = 0;
+		float Si = 0;
+		float asf = 0;  // result
+
+		final int n = -8;
+		final int B = 24;  // number of bands
+		final float loF = (float) (Math.pow(2, n/4.0) * 1000);  // lowest frequency [Hz]
+		final float hiF = (float) (Math.pow(2, B/4.0) * loF);  // highest frequency [Hz]
+		final int loK = f.freqToIndex(loF);
+		final int hiK = f.freqToIndex(hiF);
+		final float reduceFactor = hiK - loK + 1;
+
+		for(int k=loK; k<hiK; k++){
+			Si = f.getBand(k);
+			num *= Math.pow(Si, 1.0/reduceFactor);  // n-th root
+			den += Si;
+		}
+
+		den /= reduceFactor;
+		asf = num / den;
+		return asf;
+
+
+
+		// https://github.com/filipeuva/SoundBites/blob/master/src/uk/co/biogen/SoundBites/analysis/AnalysisInterface.java
+ps = powerSpectrum()
+		double geometricMean = 1.0, arithmeticMean = 0.0;
+		for (int i = 0; i < ps.length; i++) {
+			geometricMean *= ps[i];
+			arithmeticMean += ps[i];
+		}
+		geometricMean = Math.pow(geometricMean, 1 / WINDOW_SIZE_SAMPLES);
+		arithmeticMean /= WINDOW_SIZE_SAMPLES;
+
+		return geometricMean / arithmeticMean;
+	}*/
+
+	/**
+	 * Adapted from https://github.com/marytts/marytts/blob/master/marytts-signalproc/src/main/java/marytts/util/math/FFT.java
+	 * @param data
+	 * @return
+	 *//*
+	private double[] computePowerSpectrum(final double[] data) {
+		int N = data.length;
+		if (!MathUtils.isPowerOfTwo(N)) {
+			N = MathUtils.closestPowerOfTwoAbove(N);
+		}
+		double[] real = new double[N];
+		System.arraycopy(signal, 0, real, 0, data.length);
+		realTransform(real, false);
+		return computePowerSpectrum_FD(real);
+	}*/
 	
 	/**
 	 * Applies a Hanning Window to the data set.
 	 * Hanning Windows are used to increase the accuracy of the FFT.
 	 * One should always apply a window to a dataset before applying an FFT
-	 * @param The data you want to apply the window to
+	 * @param data The data you want to apply the window to
 	 * @return The windowed data set
 	 */
 	private double[] applyHanningWindow(double[] data){
@@ -165,9 +251,9 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * Applies a Hanning Window to the data set.
 	 * Hanning Windows are used to increase the accuracy of the FFT.
 	 * One should always apply a window to a dataset before applying an FFT
-	 * @param The data you want to apply the window to
-	 * @param The starting index you want to apply a window from
-	 * @param The size of the window
+	 * @param signal_in The data you want to apply the window to
+	 * @param pos The starting index you want to apply a window from
+	 * @param size The size of the window
 	 * @return The windowed data set
 	 */
 	private double[] applyHanningWindow(double[] signal_in, int pos, int size){
@@ -191,20 +277,20 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * @return The fundamental frequency in Hertz
 	 */
 	private int calculateFundamentalFrequency(Complex[] fftData, int N){
-		if(N<=0 || fftData == null){ return -1; } //error case
+		if (N <= 0 || fftData == null) { return -1; } //error case
 		
 		final int LENGTH = fftData.length;//Used to calculate bin size
 		fftData = removeNegativeFrequencies(fftData);
 		Complex[][] data = new Complex[N][fftData.length/N];
-		for(int i = 0; i<N; i++){
-			for(int j = 0; j<data[0].length; j++){
+		for (int i = 0; i<N; i++) {
+			for (int j = 0; j<data[0].length; j++) {
 				data[i][j] = fftData[j*(i+1)];
 			}
 		}
 		Complex[] result = new Complex[fftData.length/N];//Combines the arrays
-		for(int i = 0; i<result.length; i++){
+		for (int i = 0; i<result.length; i++) {
 			Complex tmp = new Complex(1,0);
-			for(int j = 0; j<N; j++){
+			for (int j = 0; j<N; j++) {
 				tmp = tmp.times(data[j][i]);
 			}
 			result[i] = tmp;
@@ -215,7 +301,7 @@ public class MicrophoneAnalyzer extends Microphone {
 
 	/**
 	 * Removes useless data from transform since sound doesn't use complex numbers.
-	 * @param The data you want to remove the complex transforms from
+	 * @param c The data you want to remove the complex transforms from
 	 * @return The cleaned data
 	 */
 	private Complex[] removeNegativeFrequencies(Complex[] c){
@@ -240,14 +326,14 @@ public class MicrophoneAnalyzer extends Microphone {
 
 	/**
 	 * Calculates index of the maximum magnitude in a complex array.
-	 * @param The Complex[] you want to get max magnitude from.
+	 * @param input The Complex[] you want to get max magnitude from.
 	 * @return The index of the max magnitude
 	 */
 	private int findMaxMagnitude(Complex[] input){
 		//Calculates Maximum Magnitude of the array
 		double max = Double.MIN_VALUE;
 		int index = -1;
-		for(int i = 0; i<input.length; i++){
+		for(int i = 1; i < input.length; i++){
 			Complex c = input[i];
 			double tmp = c.getMagnitude();
 			if(tmp>max){
@@ -268,8 +354,9 @@ public class MicrophoneAnalyzer extends Microphone {
 	    final int bytesRecorded = bufferData.length;
 		final int bytesPerSample = getAudioFormat().getSampleSizeInBits()/8; 
 	    final double amplification = 100.0; // choose a number as you like
-	    double[] micBufferData = new double[bytesRecorded - bytesPerSample +1];
-	    for (int index = 0, floatIndex = 0; index < bytesRecorded - bytesPerSample + 1; index += bytesPerSample, floatIndex++) {
+		int micBufferLength = bytesRecorded;  // bytesRecorded - bytesPerSample +1
+	    double[] micBufferData = new double[micBufferLength];
+	    for (int index = 0, floatIndex = 0; index < micBufferLength; index += bytesPerSample, floatIndex++) {
 	        double sample = 0;
 	        for (int b = 0; b < bytesPerSample; b++) {
 	            int v = bufferData[index + b];
@@ -284,5 +371,4 @@ public class MicrophoneAnalyzer extends Microphone {
 	    }
 	    return micBufferData;
 	}
-	
 }

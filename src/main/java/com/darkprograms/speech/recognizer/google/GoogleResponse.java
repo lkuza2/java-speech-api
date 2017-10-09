@@ -1,4 +1,6 @@
-package com.darkprograms.speech.recognizer;
+package com.darkprograms.speech.recognizer.google;
+
+import com.darkprograms.speech.recognizer.RecognitionResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.List;
  *
  * @author Luke Kuza, Duncan Jauncey, Aaron Gokaslan
  ******************************************************************************/
-public class GoogleResponse {
+public class GoogleResponse implements RecognitionResult {
 
     /**
      * Variable that holds the response

@@ -1,4 +1,4 @@
-package com.darkprograms.speech.recognizer;
+package com.darkprograms.speech.recognizer.google;
 
 import java.util.*;
 import java.io.*;
@@ -6,14 +6,17 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 
+import com.darkprograms.speech.recognizer.SpeechRecognizer;
 import org.json.*;
+
+import com.darkprograms.speech.encoding.FlacEncoder;
 
 /***************************************************************
  * Class that submits FLAC audio and retrieves recognized text
  *
  * @author Luke Kuza, Duncan Jauncey, Aaron Gokaslan
  **************************************************************/
-public class Recognizer {
+public class Recognizer implements SpeechRecognizer {
 
     public enum Languages{
 		AUTO_DETECT("auto"),//tells Google to auto-detect the language

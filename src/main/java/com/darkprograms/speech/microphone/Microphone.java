@@ -40,6 +40,9 @@ public class Microphone implements Closeable{
      */
     private File audioFile;
 
+    private AudioInputStream audioStream;
+    private float sampleRate;
+
     /**
      * Constructor
      *
@@ -50,6 +53,15 @@ public class Microphone implements Closeable{
         setState(CaptureState.CLOSED);
         setFileType(fileType);
         initTargetDataLine();
+    }
+
+    /**
+     * Constructor for use with {@link #captureAudioToStream()}
+     * @param sampleRate samples per second - 16_000 (recommended) or 8_000
+     */
+    public Microphone(float sampleRate) {
+        setState(CaptureState.CLOSED);
+        initTargetDataLine(sampleRate);
     }
 
     /**
@@ -100,18 +112,33 @@ public class Microphone implements Closeable{
     /**
      * Initializes the target data line.
      */
-    private void initTargetDataLine(){
+    private TargetDataLine initTargetDataLine() {
+        return initTargetDataLine(8_000F);
+    }
+    private TargetDataLine initTargetDataLine(float sampleRate) {
+        this.sampleRate = sampleRate;
         DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
         try {
-			setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
+            TargetDataLine targetDataLine = (TargetDataLine)AudioSystem.getLine(dataLineInfo);
+			setTargetDataLine(targetDataLine);
+			return targetDataLine;
 		} catch (LineUnavailableException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return;
+			return null;
 		}
-
     }
 
+    public AudioInputStream captureAudioToStream() {
+        setState(CaptureState.STARTING_CAPTURE);
+        if(getTargetDataLine() == null) {
+            initTargetDataLine();
+        }
+
+        open();
+        audioStream = new AudioInputStream(getTargetDataLine());
+        return audioStream;
+    }
 
     /**
      * Captures audio from the microphone and saves it a file
@@ -129,8 +156,6 @@ public class Microphone implements Closeable{
 
         //Get Audio
         new Thread(new CaptureThread()).start();
-
-
     }
 
     /**
@@ -144,14 +169,19 @@ public class Microphone implements Closeable{
         captureAudioToFile(file);
     }
 
-	
     /**
      * The audio format to save in
      *
      * @return Returns AudioFormat to be used later when capturing audio from microphone
      */
     public AudioFormat getAudioFormat() {
-        float sampleRate = 8000.0F;
+        return getAudioFormat(sampleRate);
+    }
+
+    /**
+     * @param sampleRate set to 16_000.0F for AWS Lex
+     */
+    public AudioFormat getAudioFormat(float sampleRate) {
         //8000,11025,16000,22050,44100
         int sampleSizeInBits = 16;
         //8,16
@@ -172,10 +202,40 @@ public class Microphone implements Closeable{
         if(getTargetDataLine()==null){
         	initTargetDataLine();
         }
-        if(!getTargetDataLine().isOpen() && !getTargetDataLine().isRunning() && !getTargetDataLine().isActive()){
+        TargetDataLine targetDataLine = getTargetDataLine();
+        if(!targetDataLine.isOpen() && !targetDataLine.isRunning() && !targetDataLine.isActive()) {
            	try {
                 setState(CaptureState.PROCESSING_AUDIO);
+
+                try {
+System.out.println("???????????????????????????????????????????????????????????");
+                    System.out.println("???????????????????????????????????????????????????????????");System.out.println("???????????????????????????????????????????????????????????");System.out.println("???????????????????????????????????????????????????????????");
+                    System.out.println("???????????????????????????????????????????????????????????");
+
+
+                    if (targetDataLine.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Setting gain!!!!!!!!!!!!!!");
+                        FloatControl gainControl = (FloatControl) getTargetDataLine().getControl(FloatControl.Type.MASTER_GAIN);
+                        gainControl.setValue(40);
+                    }
+                } catch (Exception e) {
+                    try {
+                        FloatControl gainControl = (FloatControl) getTargetDataLine().getControl(FloatControl.Type.VOLUME);
+                        gainControl.setValue(-10);
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                }
         		getTargetDataLine().open(getAudioFormat());
+
             	getTargetDataLine().start();
 			} catch (LineUnavailableException e) {
 				// TODO Auto-generated catch block
@@ -183,7 +243,6 @@ public class Microphone implements Closeable{
 				return;
 			}
         }
-
     }
 
     /**
@@ -203,7 +262,6 @@ public class Microphone implements Closeable{
      * Thread to capture the audio from the microphone and save it to a file
      */
     private class CaptureThread implements Runnable {
-
         /**
          * Run method for thread
          */
@@ -220,4 +278,14 @@ public class Microphone implements Closeable{
         }
     }
 
+    /*private class ListenThread implements Runnable {
+        public void run() {
+            try {
+                open();
+                audioStream = new AudioInputStream(getTargetDataLine());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }*/
 }
