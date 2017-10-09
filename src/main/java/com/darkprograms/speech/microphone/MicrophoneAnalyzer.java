@@ -121,7 +121,7 @@ public class MicrophoneAnalyzer extends Microphone {
 
 	/**
 	 * Calculates the frequency based off of the number of bytes. 
-	 * CAVEAT: THE NUMBER OF BYTES MUST BE A MULTIPLE OF 2!!!
+	 * CAVEAT: The number of Bytes must be a multiple of 2!
 	 * @param numOfBytes The number of bytes which must be a multiple of 2!!!
 	 * @return The calculated frequency in Hertz.
 	 */
